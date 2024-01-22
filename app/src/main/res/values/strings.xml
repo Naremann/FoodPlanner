@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FoodPlanner</string>
+    <string name="food_planner">Food Planner</string>
 </resources>
