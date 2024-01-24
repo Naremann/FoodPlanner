@@ -11,16 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import com.example.foodplanner.AlertMessage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.presenter.register.RegisterPresenter;
 import com.example.foodplanner.presenter.register.RegisterPresenterImp;
+import com.example.foodplanner.view.FragmentNavigator;
+import com.example.foodplanner.view.login.LoginFragment;
 
 public class RegisterFragment extends Fragment implements RegisterView{
 
    Button signUpBtn;
    EditText email,password;
    RegisterPresenter registerPresenter;
+   TextView haveAccountText;
     public RegisterFragment() {
     }
 
@@ -44,7 +49,13 @@ public class RegisterFragment extends Fragment implements RegisterView{
         signUpBtn=view.findViewById(R.id.signup_btn);
         email=view.findViewById(R.id.email_et);
         password=view.findViewById(R.id.pass_et);
+        haveAccountText=view.findViewById(R.id.have_account_tv);
+        haveAccountText.setOnClickListener(view1 -> navigateToLoginFragment());
         signUpBtn.setOnClickListener(view1 -> addAccountToFirebase());
+    }
+
+    private void navigateToLoginFragment() {
+        FragmentNavigator.addFragment(new LoginFragment(),this.requireActivity());
     }
 
     private void addAccountToFirebase() {
@@ -61,4 +72,5 @@ public class RegisterFragment extends Fragment implements RegisterView{
         AlertMessage.showToastMessage(error,getContext());
 
     }
+
 }

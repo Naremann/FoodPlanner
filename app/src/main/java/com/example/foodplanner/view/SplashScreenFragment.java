@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.example.foodplanner.R;
+import com.example.foodplanner.view.login.LoginFragment;
 import com.example.foodplanner.view.register.RegisterFragment;
 
 public class SplashScreenFragment extends Fragment {
@@ -29,12 +30,11 @@ public class SplashScreenFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        new Handler(Looper.getMainLooper()).postDelayed(this::navigateRegisterFragment,2000);
+        new Handler(Looper.getMainLooper()).postDelayed(this::navigateLoginFragment,2000);
 
     }
 
-    private void navigateRegisterFragment() {
-        RegisterFragment registerFragment=new RegisterFragment();
-        FragmentNavigator.addFragment(registerFragment,this.requireActivity());
+    private void navigateLoginFragment() {
+        FragmentNavigator.addFragment(new LoginFragment(),this.requireActivity());
     }
 }

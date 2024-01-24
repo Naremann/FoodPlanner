@@ -9,4 +9,8 @@
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="sign_up">Sign Up</string>
+    <string name="login">Login</string>
+    <string name="sign_in">Sign In</string>
+    <string name="you_already_have_an_account_login"><u>You Already have an account? Login</u></string>
+    <string name="you_don_t_have_an_account_signup"><u>You don\'t have an account? SignUp</u></string>
 </resources>
