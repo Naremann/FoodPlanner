@@ -20,7 +20,7 @@ import com.example.foodplanner.R;
 import com.example.foodplanner.presenter.login.LoginPresenter;
 import com.example.foodplanner.presenter.login.LoginPresenterImp;
 import com.example.foodplanner.view.FragmentNavigator;
-import com.example.foodplanner.view.home_activity.HomeActivity;
+import com.example.foodplanner.view.activity.HomeActivity;
 import com.example.foodplanner.view.auth.register.RegisterFragment;
 
 public class LoginFragment extends Fragment implements LoginView {

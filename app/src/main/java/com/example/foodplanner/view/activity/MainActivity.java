@@ -1,4 +1,4 @@
-package com.example.foodplanner.view.main_activity;
+package com.example.foodplanner.view.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
