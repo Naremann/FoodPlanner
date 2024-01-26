@@ -1,5 +1,6 @@
-package com.example.foodplanner.view.register;
+package com.example.foodplanner.view.auth.register;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,12 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.foodplanner.AlertMessage;
+import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.presenter.register.RegisterPresenter;
 import com.example.foodplanner.presenter.register.RegisterPresenterImp;
 import com.example.foodplanner.view.FragmentNavigator;
-import com.example.foodplanner.view.login.LoginFragment;
+import com.example.foodplanner.view.auth.login.LoginFragment;
 
 public class RegisterFragment extends Fragment implements RegisterView{
 
@@ -26,6 +27,7 @@ public class RegisterFragment extends Fragment implements RegisterView{
    EditText email,password;
    RegisterPresenter registerPresenter;
    TextView haveAccountText;
+   ProgressDialog progressDialog;
     public RegisterFragment() {
     }
 
@@ -46,16 +48,20 @@ public class RegisterFragment extends Fragment implements RegisterView{
     }
 
     private void initViews(View view) {
+        progressDialog=new ProgressDialog(this.getContext());
         signUpBtn=view.findViewById(R.id.signup_btn);
         email=view.findViewById(R.id.email_et);
         password=view.findViewById(R.id.pass_et);
         haveAccountText=view.findViewById(R.id.have_account_tv);
         haveAccountText.setOnClickListener(view1 -> navigateToLoginFragment());
-        signUpBtn.setOnClickListener(view1 -> addAccountToFirebase());
+        signUpBtn.setOnClickListener(view1 -> {
+            addAccountToFirebase();
+            showProgressDialog();
+        });
     }
 
     private void navigateToLoginFragment() {
-        FragmentNavigator.addFragment(new LoginFragment(),this.requireActivity());
+        FragmentNavigator.addFragment(new LoginFragment(),this.requireActivity(),R.id.fragment_container);
     }
 
     private void addAccountToFirebase() {
@@ -65,12 +71,26 @@ public class RegisterFragment extends Fragment implements RegisterView{
     @Override
     public void showSuccessMessage() {
         AlertMessage.showToastMessage("Success",getContext());
+        hideProgressDialog();
+        navigateToLoginFragment();
     }
 
     @Override
     public void showErrorMessage(String error) {
         AlertMessage.showToastMessage(error,getContext());
+        hideProgressDialog();
 
+    }
+    void showProgressDialog() {
+        progressDialog.setTitle("Loading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    void hideProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.hide();
+        }
     }
 
 }

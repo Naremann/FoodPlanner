@@ -8,10 +8,10 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.foodplanner.R;
 
 public class FragmentNavigator {
-    public static void addFragment(Fragment fragment, FragmentActivity appCompatActivity) {
+    public static void addFragment(Fragment fragment, FragmentActivity appCompatActivity,int containerViewId) {
         FragmentManager fragmentManager = appCompatActivity.getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.replace(containerViewId, fragment);
         fragmentTransaction.commit();
     }
 }

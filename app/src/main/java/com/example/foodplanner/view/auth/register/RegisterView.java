@@ -1,4 +1,4 @@
-package com.example.foodplanner.view.register;
+package com.example.foodplanner.view.auth.register;
 
 
 public interface RegisterView {

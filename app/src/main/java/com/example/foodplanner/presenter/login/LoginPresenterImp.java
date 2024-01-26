@@ -1,12 +1,7 @@
 package com.example.foodplanner.presenter.login;
 
-import androidx.annotation.NonNull;
-
 import com.example.foodplanner.db.FirebaseUtils;
-import com.example.foodplanner.view.login.LoginView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.example.foodplanner.view.auth.login.LoginView;
 
 import java.util.Objects;
 
