@@ -53,9 +53,8 @@ dependencies {
     implementation ("androidx.appcompat:appcompat:1.6.0")
 
     implementation ("com.google.android.material:material:1.8.0")
-    //implementation ("com.github.smarteist:autoimageslider:1.4.0")
-    //implementation ("com.github.bumptech.glide:glide:4.11.0")
-    //implementation ("com.github.smarteist:autoimageslider:1.4.0-appcompat")
+    //circleImage
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
 
 
     annotationProcessor("androidx.room:room-compiler:2.6.1")

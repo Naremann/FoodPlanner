@@ -4,4 +4,5 @@ import com.example.foodplanner.model.RandomMealResponse;
 
 public interface HomePresenter {
     void getRandomMeal();
+    void getCategories();
 }
