@@ -1,39 +1,34 @@
-package com.example.foodplanner.view;
+package com.example.foodplanner.view.meal_details;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import android.os.Handler;
-import android.os.Looper;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.example.foodplanner.R;
-import com.example.foodplanner.view.auth.login.LoginFragment;
 
-public class SplashScreenFragment extends Fragment {
+public class MealDetailsFragment extends Fragment {
 
 
-    public SplashScreenFragment() {
+
+    public MealDetailsFragment() {
         // Required empty public constructor
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_splash_screen, container, false);
+        return inflater.inflate(R.layout.fragment_meal_details, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        new Handler(Looper.getMainLooper()).postDelayed(this::navigateLoginFragment,2000);
-
-    }
-
-    private void navigateLoginFragment() {
-        FragmentNavigator.addFragment(new LoginFragment(),this.requireActivity(),R.id.fragment_container);
     }
 }

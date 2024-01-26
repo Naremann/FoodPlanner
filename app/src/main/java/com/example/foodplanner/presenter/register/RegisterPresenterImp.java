@@ -1,7 +1,7 @@
 package com.example.foodplanner.presenter.register;
 
 import com.example.foodplanner.db.FirebaseUtils;
-import com.example.foodplanner.view.register.RegisterView;
+import com.example.foodplanner.view.auth.register.RegisterView;
 
 import java.util.Objects;
 

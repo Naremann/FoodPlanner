@@ -1,4 +1,4 @@
-package com.example.foodplanner;
+package com.example.foodplanner.view;
 
 import android.content.Context;
 import android.widget.Toast;

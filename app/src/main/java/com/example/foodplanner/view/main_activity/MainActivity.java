@@ -17,6 +17,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         splashFragment=new SplashScreenFragment();
-        FragmentNavigator.addFragment(splashFragment,this);
+        FragmentNavigator.addFragment(splashFragment,this,R.id.fragment_container);
     }
 }
