@@ -5,7 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -15,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.example.foodplanner.Contract;
+
 import com.example.foodplanner.model.CategoryResponse;
 import com.example.foodplanner.model.repo.category.CategoryRepoImp;
 import com.example.foodplanner.model.repo.category.remote.CategoryRemoteDataSourceImp;
@@ -31,7 +32,6 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class HomeFragment extends Fragment implements HomeView{
     ImageView mealImg;
@@ -42,6 +42,8 @@ public class HomeFragment extends Fragment implements HomeView{
     CategoryAdapter categoryAdapter;
     RecyclerView categoryRecyclerView;
     ProgressBar progressBar;
+    NavController navController;
+    RandomMealResponse.MealsItem mealItem;
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -74,19 +76,19 @@ public class HomeFragment extends Fragment implements HomeView{
         cardView=view.findViewById(R.id.meal_card_view);
         cardView.setOnClickListener(v -> navigateToMealDetailsFragment());
         categoryAdapter=new CategoryAdapter(new ArrayList<>());
-       // GridLayoutManager layoutManager=new GridLayoutManager(getContext(),2,RecyclerView.HORIZONTAL,false);
         categoryRecyclerView=view.findViewById(R.id.category_recycler_view);
-        //categoryRecyclerView.setLayoutManager(layoutManager);
         categoryRecyclerView.setAdapter(categoryAdapter);
     }
 
     private void navigateToMealDetailsFragment() {
-        navigator.navigateToMealDetails();
+           HomeFragmentDirections.ActionHomeFragmentToMealDetailsFragment action =
+                   HomeFragmentDirections.actionHomeFragmentToMealDetailsFragment(mealItem);
+           Navigation.findNavController(requireView()).navigate(action);
     }
 
     @Override
     public void showSuccessMessage(RandomMealResponse.MealsItem mealsItem) {
-        sendDataToActivity(mealsItem);
+        this.mealItem=mealsItem;
         mealTitle.setText(mealsItem.getStrMeal());
         Log.e("TAG", "showSuccessMessage: "+mealsItem.getStrImageSource());
         GlideImage.downloadImageToImageView(mealImg.getContext(),mealsItem.getStrMealThumb(),mealImg);
@@ -108,14 +110,6 @@ public class HomeFragment extends Fragment implements HomeView{
     @Override
     public void showCategoryErrorMessage(String error) {
         AlertMessage.showToastMessage(error,this.getContext());
-    }
-
-    private void sendDataToActivity(RandomMealResponse.MealsItem mealsItems) {
-        if (isAdded() && (!isRemoving()|| getActivity()!=null)) {
-            ((Contract.Presenter) requireActivity()).sendDataToActivity(mealsItems);
-
-
-        }
     }
     void hideProgressBar(ProgressBar progressBar){
         progressBar.setVisibility(View.INVISIBLE);
