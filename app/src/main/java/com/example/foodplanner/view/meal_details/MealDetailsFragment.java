@@ -56,6 +56,10 @@ public class MealDetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
 
+        if (getArguments() != null) {
+            mealsItem = MealDetailsFragmentArgs.fromBundle(getArguments()).getMeal();
+            Log.e("TAG", "onViewCreated: "+mealsItem.getStrArea());
+        }
         ingredients=new ArrayList<>();
         if(mealsItem!=null){
             Log.e("TAG", "onViewCreated1: "+    mealsItem.getStrIngredient1());
@@ -63,8 +67,6 @@ public class MealDetailsFragment extends Fragment {
             ingredientAdapter.changeData(getIngredients(mealsItem));
             Log.e("TAG1", "onViewCreated: "+mealsItem.getStrCategory());
             setMealDataInViews(mealsItem);
-
-
         }
 
     }
@@ -86,11 +88,12 @@ public class MealDetailsFragment extends Fragment {
         ingredientRecyclerView.setAdapter(ingredientAdapter);
     }
 
-    public void displayData(RandomMealResponse.MealsItem mealsItem) {
+    /*public void displayData(RandomMealResponse.MealsItem mealsItem) {
         Log.e("TAG1", "displayData: " + mealsItem.getStrArea());
-        this.mealsItem=mealsItem;
+        this.mealsItem = mealsItem;
+    }*/
 
-    }
+
 
     private void setMealDataInViews(RandomMealResponse.MealsItem mealsItem)  {
         mealTitle.setText(mealsItem.getStrMeal());

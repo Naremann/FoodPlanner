@@ -1,5 +1,6 @@
 package com.example.foodplanner.model;
 
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
@@ -13,7 +14,7 @@ public class RandomMealResponse{
 	}
 
 
-	public class MealsItem{
+	public class MealsItem implements Serializable {
 
 		@SerializedName("strImageSource")
 		private Object strImageSource;

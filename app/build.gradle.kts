@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
+    id ("androidx.navigation.safeargs")
 }
 
 android {
@@ -55,6 +56,10 @@ dependencies {
     implementation ("com.google.android.material:material:1.8.0")
     //circleImage
     implementation ("de.hdodenhof:circleimageview:3.1.0")
+
+    //naviagtion component
+    implementation ("androidx.navigation:navigation-fragment:2.7.6")
+    implementation ("androidx.navigation:navigation-ui:2.7.6")
 
 
     annotationProcessor("androidx.room:room-compiler:2.6.1")
