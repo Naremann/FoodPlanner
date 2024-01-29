@@ -1,7 +1,7 @@
 package com.example.foodplanner.view.home;
 
-import com.example.foodplanner.model.CategoryResponse;
-import com.example.foodplanner.model.RandomMealResponse;
+import com.example.foodplanner.model.dto.CategoryResponse;
+import com.example.foodplanner.model.dto.RandomMealResponse;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.example.foodplanner.model;
+package com.example.foodplanner.model.dto;
 
 import java.io.Serializable;
 import java.util.List;
@@ -12,7 +12,6 @@ public class RandomMealResponse{
 	public List<MealsItem> getMeals(){
 		return meals;
 	}
-
 
 	public class MealsItem implements Serializable {
 
@@ -387,4 +386,7 @@ public class RandomMealResponse{
 			return strMeasure15;
 		}
 	}
+
+
+
 }

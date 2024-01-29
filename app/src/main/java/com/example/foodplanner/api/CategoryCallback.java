@@ -1,6 +1,6 @@
 package com.example.foodplanner.api;
 
-import com.example.foodplanner.model.CategoryResponse;
+import com.example.foodplanner.model.dto.CategoryResponse;
 
 import java.util.List;
 
