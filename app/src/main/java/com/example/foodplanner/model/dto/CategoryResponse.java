@@ -1,5 +1,6 @@
-package com.example.foodplanner.model;
+package com.example.foodplanner.model.dto;
 
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
@@ -12,7 +13,7 @@ public class CategoryResponse{
 		return categories;
 	}
 
-	public class CategoriesItem{
+	public class CategoriesItem implements Serializable {
 
 		@SerializedName("strCategory")
 		private String strCategory;

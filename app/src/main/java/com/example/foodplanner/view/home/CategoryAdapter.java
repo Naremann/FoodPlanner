@@ -10,13 +10,14 @@ import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.foodplanner.model.CategoryResponse.CategoriesItem;
-import com.example.foodplanner.model.CategoryResponse;
+import com.example.foodplanner.model.dto.CategoryResponse.CategoriesItem;
+import com.example.foodplanner.model.dto.CategoryResponse;
 
 import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
     List<CategoryResponse.CategoriesItem> categoriesItems;
+    OnItemClickListener onItemClickListener;
 
     public CategoryAdapter(List<CategoryResponse.CategoriesItem> categoriesItems) {
         this.categoriesItems = categoriesItems;
@@ -35,6 +36,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         CategoriesItem categoriesItem=categoriesItems.get(position);
         holder.categoryName.setText(categoriesItem.getStrCategory());
         GlideImage.downloadImageToImageView(holder.categoryImg.getContext(),categoriesItem.getStrCategoryThumb(),holder.categoryImg);
+        holder.itemView.setOnClickListener(view->{
+            onItemClickListener.onItemClick(categoriesItem);
+        });
     }
 
     @Override
@@ -45,6 +49,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         this.categoriesItems=categoriesItems;
         notifyDataSetChanged();
 
+    }
+
+    interface OnItemClickListener{
+        void onItemClick(CategoriesItem categoriesItem);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

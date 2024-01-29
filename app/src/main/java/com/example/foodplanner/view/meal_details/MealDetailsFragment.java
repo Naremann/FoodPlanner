@@ -1,6 +1,6 @@
 package com.example.foodplanner.view.meal_details;
 
-import static com.example.foodplanner.model.Ingredient.getIngredients;
+import static com.example.foodplanner.model.dto.Ingredient.getIngredients;
 
 import android.os.Bundle;
 
@@ -22,8 +22,8 @@ import android.widget.TextView;
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.YouTubeVideo;
-import com.example.foodplanner.model.Ingredient;
-import com.example.foodplanner.model.RandomMealResponse;
+import com.example.foodplanner.model.dto.Ingredient;
+import com.example.foodplanner.model.dto.RandomMealResponse;
 
 import java.util.ArrayList;
 import java.util.List;

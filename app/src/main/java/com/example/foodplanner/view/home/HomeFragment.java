@@ -17,15 +17,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.foodplanner.model.CategoryResponse;
+import com.example.foodplanner.model.dto.CategoryResponse;
+import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.category.CategoryRepoImp;
 import com.example.foodplanner.model.repo.category.remote.CategoryRemoteDataSourceImp;
 import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
-import com.example.foodplanner.model.RandomMealResponse;
-import com.example.foodplanner.model.repo.meal.MealRepoImp;
-import com.example.foodplanner.model.repo.meal.remote.MealRemoteDataSourceImp;
+import com.example.foodplanner.model.repo.random_meal.MealRepoImp;
+import com.example.foodplanner.model.repo.random_meal.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.home.HomePresenter;
 import com.example.foodplanner.presenter.home.HomePresenterImp;
 import com.google.android.material.card.MaterialCardView;
@@ -60,7 +60,7 @@ public class HomeFragment extends Fragment implements HomeView{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homePresenter=new HomePresenterImp(this,
-                new MealRepoImp(new MealRemoteDataSourceImp()),
+                new MealRepoImp(new RandomMealRemoteDataSourceImp()),
                 new CategoryRepoImp(new CategoryRemoteDataSourceImp()));
         homePresenter.getRandomMeal();
         homePresenter.getCategories();
@@ -76,8 +76,18 @@ public class HomeFragment extends Fragment implements HomeView{
         cardView=view.findViewById(R.id.meal_card_view);
         cardView.setOnClickListener(v -> navigateToMealDetailsFragment());
         categoryAdapter=new CategoryAdapter(new ArrayList<>());
+        categoryAdapter.onItemClickListener= categoriesItem -> {
+            navigateToCategoryMeal(categoriesItem);
+        };
         categoryRecyclerView=view.findViewById(R.id.category_recycler_view);
         categoryRecyclerView.setAdapter(categoryAdapter);
+    }
+
+    private void navigateToCategoryMeal(CategoryResponse.CategoriesItem categoriesItem) {
+        HomeFragmentDirections.ActionHomeFragmentToCategoryMealFragment action=HomeFragmentDirections
+                .actionHomeFragmentToCategoryMealFragment(categoriesItem) ;
+        Navigation.findNavController(requireView()).navigate(action);
+
     }
 
     private void navigateToMealDetailsFragment() {

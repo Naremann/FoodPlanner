@@ -21,15 +21,9 @@ public abstract class YouTubeVideo {
 
     public static void loadVideoUrlInWebView(WebView webView, String videoUrl, ProgressBar progressBar){
         String videoId = extractVideoId(videoUrl);
-
-        // Create the embed URL
         String embedUrl = "https://www.youtube.com/embed/" + videoId;
-
-        // Enable JavaScript in the WebView
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-
-        // Enable hardware acceleration for better performance
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -38,8 +32,6 @@ public abstract class YouTubeVideo {
             }
         });
         webView.setWebChromeClient(new WebChromeClient());
-
-        // Load the YouTube video using the embed URL
         webView.loadUrl(embedUrl);
 
     }

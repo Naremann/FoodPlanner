@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_homeFragment_to_mealDetailsFragment"
             app:destination="@id/mealDetailsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_categoryMealFragment"
+            app:destination="@id/categoryMealFragment" />
     </fragment>
     <fragment
         android:id="@+id/mealDetailsFragment"
@@ -21,7 +24,17 @@
         tools:layout="@layout/fragment_meal_details" >
         <argument
             android:name="Meal"
-            app:argType="com.example.foodplanner.model.RandomMealResponse$MealsItem"
+            app:argType="com.example.foodplanner.model.dto.RandomMealResponse$MealsItem"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/categoryMealFragment"
+        android:name="com.example.foodplanner.view.meal_by_category.CategoryMealFragment"
+        android:label="fragment_category_meal"
+        tools:layout="@layout/fragment_category_meal" >
+        <argument
+            android:name="Category"
+            app:argType="com.example.foodplanner.model.dto.CategoryResponse$CategoriesItem"
             app:nullable="true" />
     </fragment>
 </navigation>

@@ -1,4 +1,4 @@
-package com.example.foodplanner.model;
+package com.example.foodplanner.model.dto;
 
 import android.util.Log;
 
