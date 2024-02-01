@@ -1,5 +1,6 @@
 package com.example.foodplanner.view.activity;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -17,6 +18,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         splashFragment=new SplashScreenFragment();
+        hideActionBar();
         FragmentNavigator.addFragment(splashFragment,this,R.id.fragment_container);
+
+    }
+
+    private void hideActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
     }
 }

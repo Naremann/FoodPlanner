@@ -15,12 +15,7 @@ public interface WebService {
     @GET("/api/json/v1/1/categories.php")
     Call<CategoryResponse> getCategories();
 
-   // @GET("api/json/v1/1/filter.php")
-
    @GET("/api/json/v1/1/filter.php")
-    //@GET("api/json/v1/1/list.php?c=list")
    Call<MealResponse>getAllMealsByCategory(@Query("c") String category);
-   //@GET("api/json/v1/1/list.php?c=list")
-   // Observable<Response<MealResponse>> getAllMealsByCategory(@Query("strCategory") String category);
 
 }
