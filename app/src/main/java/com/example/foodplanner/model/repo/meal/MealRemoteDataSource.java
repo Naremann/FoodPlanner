@@ -9,9 +9,11 @@ import retrofit2.Response;
 import com.example.foodplanner.api.ApiManager;
 import com.example.foodplanner.api.WebService;
 import com.example.foodplanner.model.dto.MealResponse;
+import com.example.foodplanner.model.dto.RandomMealResponse;
 
 public interface MealRemoteDataSource {
     @NonNull Observable<Object> getMealByCategory(String category);
+    Observable<Object> getMealById(String mealId);
 
     class MealRemoteDataSourceImp implements MealRemoteDataSource {
         WebService webService;
@@ -36,6 +38,28 @@ public interface MealRemoteDataSource {
 
                     @Override
                     public void onFailure(Call<MealResponse> call, Throwable t) {
+                        emitter.onError(t);
+                    }
+                });
+            }).subscribeOn(Schedulers.io());
+        }
+
+        @Override
+        public @NonNull Observable<Object> getMealById(String mealId) {
+            return Observable.create(emitter -> {
+                webService.getMealById(mealId).enqueue(new Callback<RandomMealResponse>() {
+                    @Override
+                    public void onResponse(Call<RandomMealResponse> call, Response<RandomMealResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            emitter.onNext(response.body().getMeals().get(0));
+                            emitter.onComplete();
+                        } else {
+                            emitter.onError(new Throwable("Failed to get meals"));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RandomMealResponse> call, Throwable t) {
                         emitter.onError(t);
                     }
                 });

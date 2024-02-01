@@ -18,4 +18,7 @@ public interface WebService {
    @GET("/api/json/v1/1/filter.php")
    Call<MealResponse>getAllMealsByCategory(@Query("c") String category);
 
+   @GET("/api/json/v1/1/lookup.php")
+   Call<RandomMealResponse> getMealById(@Query("i") String mealId);
+
 }

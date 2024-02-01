@@ -24,6 +24,7 @@ import com.example.foodplanner.R;
 import com.example.foodplanner.YouTubeVideo;
 import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.RandomMealResponse;
+import com.example.foodplanner.view.meal_by_category.CategoryMealFragmentArgs;
 
 import java.util.ArrayList;
 import java.util.List;
