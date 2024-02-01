@@ -3,6 +3,7 @@ package com.example.foodplanner.presenter.meal_by_category;
 import android.util.Log;
 import com.example.foodplanner.api.CategoryMealCallBack;
 import com.example.foodplanner.model.dto.MealsItem;
+import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.meal.MealRemoteDataSource;
 import com.example.foodplanner.view.meal_by_category.MealByCategoryView;
 import java.util.List;
@@ -12,6 +13,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public interface MealPresenter {
     void getMealByCategory(String category);
+    void getMealById(String mealId);
 
     public class MealPresenterImp implements MealPresenter, CategoryMealCallBack {
         MealRemoteDataSource mealRemoteDataSource;
@@ -37,8 +39,26 @@ public interface MealPresenter {
             );
         }
 
+        @Override
+        public void getMealById(String mealId) {
+            compositeDisposable.add(
+                    mealRemoteDataSource.getMealById(mealId)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    this::handleMealByIdSuccess,
+                                    this::handleError
+                            )
+            );
+        }
+
         private void handleSuccess(Object o) {
             meal.showMeal((List<MealsItem>)o);
+        }
+
+
+        private void handleMealByIdSuccess(Object o) {
+            meal.showMealById((RandomMealResponse.MealsItem)o);
         }
 
         private void handleSuccess(List<MealsItem> mealsItems) {
@@ -46,6 +66,17 @@ public interface MealPresenter {
         }
 
         private void handleError(Throwable throwable) {
+            Log.e("MealPresenter", "Error: " + throwable.getLocalizedMessage());
+            meal.showError("Error loading meals");
+        }
+
+
+
+        private void handleMealByIdSuccess(RandomMealResponse.MealsItem mealsItems) {
+            meal.showMealById(mealsItems);
+        }
+
+        private void handleMealByIdError(Throwable throwable) {
             Log.e("MealPresenter", "Error: " + throwable.getLocalizedMessage());
             meal.showError("Error loading meals");
         }
@@ -59,6 +90,18 @@ public interface MealPresenter {
         public void onFailureCategoryMeal(String errorMessage) {
             handleError(new Throwable(errorMessage));
         }
+
+        @Override
+        public void onSuccessByMealId(RandomMealResponse.MealsItem mealsItem) {
+            meal.showMealById(mealsItem);
+        }
+
+        @Override
+        public void onFailureByMealId(String errorMessage) {
+
+            meal.showErrorOfMealById(errorMessage);
+        }
+
         public void onDestroy() {
             compositeDisposable.clear();
         }

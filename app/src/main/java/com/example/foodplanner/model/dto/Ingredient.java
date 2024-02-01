@@ -85,7 +85,7 @@ public class Ingredient {
     private static boolean validateIngredient(String ingredientName) {
         boolean isValidate=true;
         for (int i=0;i<20;i++){
-            if (ingredientName.equals("")){
+            if (ingredientName != null && ingredientName.equals("")){
                 isValidate = false;
                 break;
             }

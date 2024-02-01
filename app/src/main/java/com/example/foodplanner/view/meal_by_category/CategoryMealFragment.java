@@ -9,14 +9,17 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.MealsItem;
+import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.meal.MealRemoteDataSource;
 import com.example.foodplanner.presenter.meal_by_category.MealPresenter;
 import com.example.foodplanner.view.AlertMessage;
+import com.example.foodplanner.view.home.HomeFragmentDirections;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +68,9 @@ public class CategoryMealFragment extends Fragment implements MealByCategoryView
     private void initViews(View view) {
         mealAdapter = new MealAdapter(new ArrayList<>());
         recyclerView = view.findViewById(R.id.meal_recycler_view);
+        mealAdapter.onItemClickListener= mealsItem -> mealPresenter.getMealById(mealsItem.getIdMeal());
         recyclerView.setAdapter(mealAdapter);
+
     }
 
     @Override
@@ -75,6 +80,23 @@ public class CategoryMealFragment extends Fragment implements MealByCategoryView
 
     @Override
     public void showError(String error) {
+        AlertMessage.showToastMessage(error, requireContext());
+    }
+
+    @Override
+    public void showMealById(RandomMealResponse.MealsItem mealsItems) {
+        navigateToMealDetailsFragment(mealsItems);
+    }
+
+    private void navigateToMealDetailsFragment(RandomMealResponse.MealsItem mealsItems) {
+        CategoryMealFragmentDirections.ActionCategoryMealFragmentToMealDetailsFragment action=CategoryMealFragmentDirections
+                .actionCategoryMealFragmentToMealDetailsFragment(mealsItems) ;
+        Navigation.findNavController(requireView()).navigate(action);
+
+    }
+
+    @Override
+    public void showErrorOfMealById(String error) {
         AlertMessage.showToastMessage(error, requireContext());
     }
 }

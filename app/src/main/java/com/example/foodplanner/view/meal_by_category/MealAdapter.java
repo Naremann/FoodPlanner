@@ -16,6 +16,7 @@ import java.util.List;
 
 public class MealAdapter extends RecyclerView.Adapter<MealAdapter.ViewHolder> {
    List<MealsItem> mealsItems;
+  public OnItemClickListener onItemClickListener;
 
     public MealAdapter(List<MealsItem> mealsItems) {
         this.mealsItems = mealsItems;
@@ -35,6 +36,13 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.ViewHolder> {
         holder.mealNameTv.setText(mealsItem.getStrMeal());
         GlideImage.
                 downloadImageToImageView(holder.mealImg.getContext(),mealsItem.getStrMealThumb(),holder.mealImg);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemClick(mealsItem);
+            }
+        });
+
     }
 
     @Override
@@ -59,5 +67,8 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.ViewHolder> {
             mealImg=view.findViewById(R.id.meal_img);
             mealNameTv=view.findViewById(R.id.meal_title_tv);
         }
+    }
+    interface OnItemClickListener{
+        void onItemClick(MealsItem mealsItem);
     }
 }
