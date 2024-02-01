@@ -8,8 +8,8 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.foodplanner.view.home.HomeFragment"
-        android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        android:label="Home"
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_mealDetailsFragment"
             app:destination="@id/mealDetailsFragment" />
@@ -20,8 +20,8 @@
     <fragment
         android:id="@+id/mealDetailsFragment"
         android:name="com.example.foodplanner.view.meal_details.MealDetailsFragment"
-        android:label="fragment_meal_details"
-        tools:layout="@layout/fragment_meal_details" >
+        android:label="Meal Details"
+        tools:layout="@layout/fragment_meal_details">
         <argument
             android:name="Meal"
             app:argType="com.example.foodplanner.model.dto.RandomMealResponse$MealsItem"
@@ -30,8 +30,8 @@
     <fragment
         android:id="@+id/categoryMealFragment"
         android:name="com.example.foodplanner.view.meal_by_category.CategoryMealFragment"
-        android:label="fragment_category_meal"
-        tools:layout="@layout/fragment_category_meal" >
+        android:label="Category Meal"
+        tools:layout="@layout/fragment_category_meal">
         <argument
             android:name="Category"
             app:argType="com.example.foodplanner.model.dto.CategoryResponse$CategoriesItem"

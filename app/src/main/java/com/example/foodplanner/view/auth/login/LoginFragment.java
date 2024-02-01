@@ -1,7 +1,10 @@
 package com.example.foodplanner.view.auth.login;
 
+import static androidx.core.content.ContextCompat.getColor;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,6 +25,7 @@ import com.example.foodplanner.presenter.login.LoginPresenterImp;
 import com.example.foodplanner.view.FragmentNavigator;
 import com.example.foodplanner.view.activity.HomeActivity;
 import com.example.foodplanner.view.auth.register.RegisterFragment;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class LoginFragment extends Fragment implements LoginView {
 
@@ -30,6 +34,7 @@ public class LoginFragment extends Fragment implements LoginView {
     TextView haveAccountText;
     LoginPresenter loginPresenter;
     ProgressDialog progressDialog;
+    TextInputLayout inputLayoutEmail,inputLayoutPass;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -50,6 +55,8 @@ public class LoginFragment extends Fragment implements LoginView {
     }
 
     private void initViews(View view) {
+        inputLayoutEmail =view.findViewById(R.id.email_input_layout);
+        inputLayoutPass=view.findViewById(R.id.pass_input_layout);
         progressDialog = new ProgressDialog(this.getContext());
         signInBtn = view.findViewById(R.id.sign_in_btn);
         email = view.findViewById(R.id.email_et);
@@ -58,8 +65,10 @@ public class LoginFragment extends Fragment implements LoginView {
         haveAccountText.setOnClickListener(view1 -> navigateToRegisterFragment());
         signInBtn.setOnClickListener(view1 ->
         {
-            loginWithFirebaseAuth();
-            showProgressDialog();
+            if(validateFields()) {
+                loginWithFirebaseAuth();
+                showProgressDialog();
+            }
         });
     }
 
@@ -80,7 +89,7 @@ public class LoginFragment extends Fragment implements LoginView {
     }
 
     private void loginWithFirebaseAuth() {
-        loginPresenter.signInWithFirebaseAuth(email.getText().toString(), password.getText().toString());
+            loginPresenter.signInWithFirebaseAuth(email.getText().toString(), password.getText().toString());
     }
 
     @Override
@@ -99,5 +108,28 @@ public class LoginFragment extends Fragment implements LoginView {
     public void showErrorMessage(String error) {
         AlertMessage.showToastMessage(error, this.getContext());
         hideProgressDialog();
+    }
+    boolean validateFields(){
+        boolean isValid=true;
+        if(email.getText().toString().isEmpty()){
+            showInputLayoutError("Please Enter The Email", inputLayoutEmail);
+        }
+        else {
+            showInputLayoutError(null, inputLayoutEmail);
+        }
+        if(password.getText().toString().isEmpty()){
+            showInputLayoutError("Please Enter The Password",inputLayoutPass);
+            isValid=false;
+        }
+        else {
+            showInputLayoutError(null,inputLayoutPass);
+        }
+        return isValid;
+    }
+
+    private void showInputLayoutError(String errorMessage, TextInputLayout inputLayout) {
+        inputLayout.setError(errorMessage);
+        inputLayout.setBoxStrokeErrorColor(ColorStateList.valueOf(getColor(this.requireContext(), R.color.red)));
+
     }
 }
