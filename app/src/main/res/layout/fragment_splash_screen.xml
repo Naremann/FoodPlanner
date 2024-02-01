@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.SplashScreenFragment">
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardview"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -19,7 +20,7 @@
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
-
+            android:id="@+id/root_layout"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginBottom="4dp"
