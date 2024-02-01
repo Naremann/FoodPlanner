@@ -68,6 +68,9 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("com.squareup.retrofit2:adapter-rxjava3:2.9.0")
+    //lotti
+    implementation ("com.airbnb.android:lottie:3.7.0")
+
 
 
 
