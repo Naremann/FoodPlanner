@@ -19,13 +19,14 @@ import android.widget.TextView;
 
 import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.RandomMealResponse;
-import com.example.foodplanner.model.repo.category.CategoryRepoImp;
-import com.example.foodplanner.model.repo.category.remote.CategoryRemoteDataSourceImp;
+import com.example.foodplanner.model.repo.local.MealLocalDatasource;
+import com.example.foodplanner.model.repo.remote.CategoryRemoteDataSourceImp;
+import com.example.foodplanner.model.repo.remote.CategoryRepo;
 import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
-import com.example.foodplanner.model.repo.random_meal.MealRepoImp;
-import com.example.foodplanner.model.repo.random_meal.remote.RandomMealRemoteDataSourceImp;
+import com.example.foodplanner.model.repo.MealRepoImp;
+import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.home.HomePresenter;
 import com.example.foodplanner.presenter.home.HomePresenterImp;
 import com.google.android.material.card.MaterialCardView;
@@ -60,8 +61,8 @@ public class HomeFragment extends Fragment implements HomeView{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homePresenter=new HomePresenterImp(this,
-                new MealRepoImp(new RandomMealRemoteDataSourceImp()),
-                new CategoryRepoImp(new CategoryRemoteDataSourceImp()));
+                new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.getContext())),
+                new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()));
         homePresenter.getRandomMeal();
         homePresenter.getCategories();
         intiViews(view);

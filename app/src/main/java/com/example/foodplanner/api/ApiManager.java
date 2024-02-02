@@ -11,7 +11,7 @@ public class ApiManager {
     public static Retrofit getInstance(){
         if(retrofit==null){
             retrofit=new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava3CallAdapterFactory.createWithScheduler(Schedulers.io()))
+                    .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
 
                     .build();
         }

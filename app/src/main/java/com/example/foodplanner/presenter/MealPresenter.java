@@ -1,10 +1,10 @@
-package com.example.foodplanner.presenter.meal_by_category;
+package com.example.foodplanner.presenter;
 
 import android.util.Log;
 import com.example.foodplanner.api.CategoryMealCallBack;
 import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
-import com.example.foodplanner.model.repo.meal.MealRemoteDataSource;
+import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.view.meal_by_category.MealByCategoryView;
 import java.util.List;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
