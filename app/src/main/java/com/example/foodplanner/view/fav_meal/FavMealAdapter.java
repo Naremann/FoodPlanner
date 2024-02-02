@@ -18,6 +18,8 @@ import java.util.List;
 public class FavMealAdapter extends RecyclerView.Adapter<FavMealAdapter.ViewHolder> {
     List<RandomMealResponse.MealsItem> mealsItems;
     OnDeleteTextClickListener onDeleteTextClickListener;
+    OnItemClickListener onItemClickListener;
+
 
     public FavMealAdapter(List<RandomMealResponse.MealsItem> mealsItems) {
         this.mealsItems = mealsItems;
@@ -40,6 +42,13 @@ public class FavMealAdapter extends RecyclerView.Adapter<FavMealAdapter.ViewHold
             @Override
             public void onClick(View v) {
                 onDeleteTextClickListener.onDeleteClick(mealItem);
+            }
+        });
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemClick(mealItem);
             }
         });
     }
@@ -73,5 +82,8 @@ public class FavMealAdapter extends RecyclerView.Adapter<FavMealAdapter.ViewHold
 
     public interface OnDeleteTextClickListener{
         void onDeleteClick(RandomMealResponse.MealsItem mealsItem);
+    }
+    public interface OnItemClickListener{
+        void onItemClick(RandomMealResponse.MealsItem mealsItem);
     }
 }

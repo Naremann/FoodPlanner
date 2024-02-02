@@ -11,13 +11,13 @@ public class SharedPreferencesManager {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    public static void saveFavoriteStatus(Context context, boolean isFavorite) {
+    public static void saveFavoriteStatus(Context context, boolean isFavorite, String mealId) {
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
-        editor.putBoolean(FAVORITE_KEY, isFavorite);
+        editor.putBoolean(FAVORITE_KEY + mealId, isFavorite);
         editor.apply();
     }
 
-    public static boolean loadFavoriteStatus(Context context) {
-        return getSharedPreferences(context).getBoolean(FAVORITE_KEY, false);
+    public static boolean loadFavoriteStatus(Context context, String mealId) {
+        return getSharedPreferences(context).getBoolean(FAVORITE_KEY + mealId, false);
     }
 }

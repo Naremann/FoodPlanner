@@ -2,6 +2,7 @@ package com.example.foodplanner.view;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,11 +16,18 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 
+import com.example.foodplanner.Constants;
 import com.example.foodplanner.R;
+import com.example.foodplanner.view.activity.HomeActivity;
 import com.example.foodplanner.view.auth.login.LoginFragment;
+import com.example.foodplanner.view.home.HomeFragment;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SplashScreenFragment extends Fragment {
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseUser user = auth.getCurrentUser();
 
 
     public SplashScreenFragment() {
@@ -44,7 +52,20 @@ public class SplashScreenFragment extends Fragment {
                 return true;
             }
         });
-        new Handler(Looper.getMainLooper()).postDelayed(this::navigateLoginFragment,2000);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkUserAuthentication();
+
+                /*if(Constants.CURRENT_USER !=null){
+                    Intent intent= new Intent(getContext(), HomeFragment.class);
+                    startActivity(intent);
+                }
+                else
+                    navigateLoginFragment();*/
+            }
+        },2000);
+        //new Handler(Looper.getMainLooper()).postDelayed(this::navigateLoginFragment,2000);
 
     }
 
@@ -72,4 +93,17 @@ public class SplashScreenFragment extends Fragment {
     private void navigateLoginFragment() {
         FragmentNavigator.addFragment(new LoginFragment(),this.requireActivity(),R.id.fragment_container);
     }
+
+    private void checkUserAuthentication() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(getContext(), HomeActivity.class);
+            startActivity(intent);
+        } else {
+            navigateLoginFragment();
+        }
+    }
+
+
+
 }

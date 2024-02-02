@@ -46,6 +46,8 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
     WebView webView;
     ProgressBar videoProgressBar;
     MealDetailsPresenter mealDetailsPresenter;
+    boolean isFavorite;
+
 
 
 
@@ -62,39 +64,34 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        boolean isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext());
         mealDetailsPresenter=new MealDetailsPresenter.
                 MealDetailsPresenterImp(new MealRepoImp(new RandomMealRemoteDataSourceImp(), new
                 MealLocalDatasource.MealLocalDataSourceImp(this.requireContext())),this);
         initViews(view);
-        if (isFavorite) {
-            fillHeartImg.setVisibility(View.VISIBLE);
-            emptyHeartImg.setVisibility(View.INVISIBLE);
-        } else {
-            fillHeartImg.setVisibility(View.INVISIBLE);
-            emptyHeartImg.setVisibility(View.VISIBLE);
-        }
-
         if (getArguments() != null) {
             mealsItem = MealDetailsFragmentArgs.fromBundle(getArguments()).getMeal();
+             isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext(),mealsItem.getIdMeal());
+            updateHeartIconVisibility();
             Log.e("TAG", "onViewCreated: "+mealsItem.getStrArea());
             emptyHeartImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                   // isFavorite=true;
                     mealDetailsPresenter.addMealToFavorite(mealsItem);
                     fillHeartImg.setVisibility(View.VISIBLE);
                     emptyHeartImg.setVisibility(View.INVISIBLE);
-                    SharedPreferencesManager.saveFavoriteStatus(getContext(), true);
+                    SharedPreferencesManager.saveFavoriteStatus(getContext(), true,mealsItem.getIdMeal());
 
                 }
             });
             fillHeartImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                   // isFavorite=false;
                     mealDetailsPresenter.deleteFavMeals(mealsItem);
                     fillHeartImg.setVisibility(View.INVISIBLE);
                     emptyHeartImg.setVisibility(View.VISIBLE);
-                    SharedPreferencesManager.saveFavoriteStatus(getContext(), false);
+                    SharedPreferencesManager.saveFavoriteStatus(getContext(), false,mealsItem.getIdMeal());
                 }
             });
         }
@@ -161,5 +158,17 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
     @Override
     public void onFailDeleteFromFav(String error) {
         AlertMessage.showToastMessage(error,this.getContext());
+    }
+
+
+
+    private void updateHeartIconVisibility() {
+        if (isFavorite) {
+            fillHeartImg.setVisibility(View.VISIBLE);
+            emptyHeartImg.setVisibility(View.INVISIBLE);
+        } else {
+            fillHeartImg.setVisibility(View.INVISIBLE);
+            emptyHeartImg.setVisibility(View.VISIBLE);
+        }
     }
 }
