@@ -1,4 +1,4 @@
-package com.example.foodplanner.model.repo.meal;
+package com.example.foodplanner.model.repo.remote;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;

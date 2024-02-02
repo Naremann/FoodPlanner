@@ -1,4 +1,4 @@
-package com.example.foodplanner.model.repo.category.remote;
+package com.example.foodplanner.model.repo.remote;
 
 import com.example.foodplanner.api.CategoryCallback;
 import com.example.foodplanner.model.dto.CategoryResponse;

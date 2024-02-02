@@ -16,10 +16,9 @@ import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
-import com.example.foodplanner.model.repo.meal.MealRemoteDataSource;
-import com.example.foodplanner.presenter.meal_by_category.MealPresenter;
+import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
+import com.example.foodplanner.presenter.MealPresenter;
 import com.example.foodplanner.view.AlertMessage;
-import com.example.foodplanner.view.home.HomeFragmentDirections;
 
 import java.util.ArrayList;
 import java.util.List;

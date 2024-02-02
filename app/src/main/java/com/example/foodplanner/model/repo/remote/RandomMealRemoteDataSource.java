@@ -1,4 +1,4 @@
-package com.example.foodplanner.model.repo.random_meal.remote;
+package com.example.foodplanner.model.repo.remote;
 
 import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.model.dto.RandomMealResponse;

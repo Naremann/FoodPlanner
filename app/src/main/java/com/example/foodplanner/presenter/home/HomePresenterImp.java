@@ -4,8 +4,8 @@ import com.example.foodplanner.api.CategoryCallback;
 import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.RandomMealResponse;
-import com.example.foodplanner.model.repo.category.CategoryRepo;
-import com.example.foodplanner.model.repo.random_meal.MealRepo;
+import com.example.foodplanner.model.repo.MealRepo;
+import com.example.foodplanner.model.repo.remote.CategoryRepo;
 import com.example.foodplanner.view.home.HomeView;
 
 import java.util.List;

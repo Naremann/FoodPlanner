@@ -1,0 +1,23 @@
+package com.example.foodplanner.db;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+public class SharedPreferencesManager {
+    private static final String PREF_NAME = "MyPrefs";
+    private static final String FAVORITE_KEY = "isMealFavorite";
+
+    private static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    public static void saveFavoriteStatus(Context context, boolean isFavorite) {
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putBoolean(FAVORITE_KEY, isFavorite);
+        editor.apply();
+    }
+
+    public static boolean loadFavoriteStatus(Context context) {
+        return getSharedPreferences(context).getBoolean(FAVORITE_KEY, false);
+    }
+}
