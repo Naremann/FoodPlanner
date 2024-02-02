@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,16 +60,15 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
         LinearLayoutManager layoutManager=new LinearLayoutManager(this.requireContext(),RecyclerView.VERTICAL,false);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         favMealAdapter.onDeleteTextClickListener= mealsItem -> deleteMealFromFav(mealsItem);
+        favMealAdapter.onItemClickListener= mealsItem -> navigateToMealDetailsFragment(mealsItem);
         recyclerView.setAdapter(favMealAdapter);
         recyclerView.setLayoutManager(layoutManager);
-        //recyclerView.smoothScrollToPosition(0);
-
     }
 
     private void deleteMealFromFav(RandomMealResponse.MealsItem mealsItem) {
         String title="Are you sure you want to delete the meal from your favorites?";
         AlertMessage.showCustomAlertDialog(getContext(),title,"Yes", (dialog, which) -> favMealPresenter.deleteFavMeals(mealsItem));
-        SharedPreferencesManager.saveFavoriteStatus(this.requireContext(),false);
+        SharedPreferencesManager.saveFavoriteStatus(this.requireContext(),false,mealsItem.getIdMeal());
     }
 
     @Override
@@ -89,5 +89,13 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
     @Override
     public void onGetAllFavoriteMealsError(String errorMessage) {
         AlertMessage.showToastMessage(errorMessage,this.requireContext());
+    }
+
+
+    private void navigateToMealDetailsFragment(RandomMealResponse.MealsItem mealsItems) {
+        FavoriteMealsFragmentDirections.ActionFavoriteMealsFragmentToMealDetailsFragment action=FavoriteMealsFragmentDirections
+                .actionFavoriteMealsFragmentToMealDetailsFragment(mealsItems) ;
+        Navigation.findNavController(requireView()).navigate(action);
+
     }
 }
