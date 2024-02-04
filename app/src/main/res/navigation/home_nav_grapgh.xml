@@ -32,13 +32,13 @@
         android:name="com.example.foodplanner.view.meal_by_category.CategoryMealFragment"
         android:label="Category Meal"
         tools:layout="@layout/fragment_category_meal">
-        <argument
-            android:name="Category"
-            app:argType="com.example.foodplanner.model.dto.CategoryResponse$CategoriesItem"
-            app:nullable="true" />
         <action
             android:id="@+id/action_categoryMealFragment_to_mealDetailsFragment"
             app:destination="@id/mealDetailsFragment" />
+        <argument
+            android:name="CategoryName"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/favoriteMealsFragment"
@@ -49,4 +49,18 @@
             android:id="@+id/action_favoriteMealsFragment_to_mealDetailsFragment"
             app:destination="@id/mealDetailsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/searchFragment2"
+        android:name="com.example.foodplanner.view.serach_meal.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment2_to_categoryMealFragment"
+            app:destination="@id/categoryMealFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/calenderFragment"
+        android:name="com.example.foodplanner.CalenderFragment"
+        android:label="fragment_calender"
+        tools:layout="@layout/fragment_calender" />
 </navigation>

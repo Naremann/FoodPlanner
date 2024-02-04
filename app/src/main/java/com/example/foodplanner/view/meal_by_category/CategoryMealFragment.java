@@ -25,7 +25,8 @@ import java.util.List;
 
 public class CategoryMealFragment extends Fragment implements MealByCategoryView {
 
-    private CategoryResponse.CategoriesItem categoryItem;
+    //private CategoryResponse.CategoriesItem categoryItem;
+    String categoryItem;
     private RecyclerView recyclerView;
     private MealAdapter mealAdapter;
     private MealPresenter mealPresenter;
@@ -56,10 +57,11 @@ public class CategoryMealFragment extends Fragment implements MealByCategoryView
 
     private void retrieveCategoryFromArguments() {
         if (getArguments() != null) {
-            categoryItem = CategoryMealFragmentArgs.fromBundle(getArguments()).getCategory();
+            //categoryItem = CategoryMealFragmentArgs.fromBundle(getArguments()).getCategory();
+            categoryItem = CategoryMealFragmentArgs.fromBundle(getArguments()).getCategoryName();
             if (categoryItem != null) {
-                Log.e("TAG", "onViewCreated: " + categoryItem.getStrCategory());
-                mealPresenter.getMealByCategory(categoryItem.getStrCategory());
+               // Log.e("TAG", "onViewCreated: " + categoryItem.getStrCategory());
+                mealPresenter.getMealByCategory(categoryItem);
             }
         }
     }

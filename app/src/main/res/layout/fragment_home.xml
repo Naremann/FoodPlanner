@@ -6,7 +6,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.home.HomeFragment"
     android:paddingHorizontal="10dp"
-    android:paddingVertical="30dp"
     >
    <androidx.constraintlayout.widget.ConstraintLayout
        android:layout_width="match_parent"
