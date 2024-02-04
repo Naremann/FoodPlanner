@@ -17,7 +17,7 @@ import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
     List<CategoryResponse.CategoriesItem> categoriesItems;
-    OnItemClickListener onItemClickListener;
+    public OnItemClickListener onItemClickListener;
 
     public CategoryAdapter(List<CategoryResponse.CategoriesItem> categoriesItems) {
         this.categoriesItems = categoriesItems;
@@ -45,13 +45,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public int getItemCount() {
         return categoriesItems.size();
     }
-    void changeData(List<CategoryResponse.CategoriesItem> categoriesItems){
+    public void changeData(List<CategoryResponse.CategoriesItem> categoriesItems){
         this.categoriesItems=categoriesItems;
         notifyDataSetChanged();
 
     }
 
-    interface OnItemClickListener{
+    public interface OnItemClickListener{
         void onItemClick(CategoriesItem categoriesItem);
     }
 

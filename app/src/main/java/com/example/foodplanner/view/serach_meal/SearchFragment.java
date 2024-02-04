@@ -1,4 +1,4 @@
-package com.example.foodplanner.view.home;
+package com.example.foodplanner.view.serach_meal;
 
 import android.os.Bundle;
 
@@ -15,26 +15,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.example.foodplanner.GlideImage;
+import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.RandomMealResponse;
+import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.CategoryRemoteDataSourceImp;
 import com.example.foodplanner.model.repo.remote.CategoryRepo;
-import com.example.foodplanner.view.AlertMessage;
-import com.example.foodplanner.GlideImage;
-import com.example.foodplanner.R;
-import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.home.HomePresenter;
 import com.example.foodplanner.presenter.home.HomePresenterImp;
+import com.example.foodplanner.view.AlertMessage;
+import com.example.foodplanner.view.home.CategoryAdapter;
+import com.example.foodplanner.view.home.HomeFragmentDirections;
+import com.example.foodplanner.view.home.HomeView;
+import com.example.foodplanner.view.home.Navigator;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements HomeView{
+public class SearchFragment extends Fragment implements HomeView {
+
     ImageView mealImg;
     TextView mealTitle;
     HomePresenter homePresenter;
@@ -42,19 +48,18 @@ public class HomeFragment extends Fragment implements HomeView{
     public Navigator navigator;
     CategoryAdapter categoryAdapter;
     RecyclerView categoryRecyclerView;
-    ProgressBar progressBar;
-    NavController navController;
+    SearchView searchBar;
     RandomMealResponse.MealsItem mealItem;
-    public HomeFragment() {
+
+    public SearchFragment() {
         // Required empty public constructor
     }
 
-
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_search, container, false);
+
     }
 
     @Override
@@ -63,59 +68,64 @@ public class HomeFragment extends Fragment implements HomeView{
         homePresenter=new HomePresenterImp(this,
                 new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.getContext())),
                 new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()));
-        homePresenter.getRandomMeal();
         homePresenter.getCategories();
         intiViews(view);
 
-
     }
+
 
     private void intiViews(View view) {
-        mealImg=view.findViewById(R.id.meal_img);
-        mealTitle=view.findViewById(R.id.meal_title_tv);
-        progressBar=view.findViewById(R.id.recycler_progress_bar);
-        cardView=view.findViewById(R.id.meal_card_view);
-        cardView.setOnClickListener(v -> navigateToMealDetailsFragment());
-        categoryAdapter=new CategoryAdapter(new ArrayList<>());
+        //progressBar=view.findViewById(R.id.recycler_progress_bar);
+        searchBar=view.findViewById(R.id.search_view);
+        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Handle the search query when the user submits it
+                navigateToCategoryMeal(query);
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // Handle changes in the search query text
+                // This method is called every time the user types a character
+                return true;
+            }
+        });
+
+
+
+    categoryAdapter=new CategoryAdapter(new ArrayList<>());
         categoryAdapter.onItemClickListener= categoriesItem -> {
-            navigateToCategoryMeal(categoriesItem);
+            navigateToCategoryMeal(categoriesItem.getStrCategory());
         };
-        categoryRecyclerView=view.findViewById(R.id.category_recycler_view);
+        categoryRecyclerView=view.findViewById(R.id.recyclerview_meals);
         categoryRecyclerView.setAdapter(categoryAdapter);
-    }
-
-    private void navigateToCategoryMeal(CategoryResponse.CategoriesItem categoriesItem) {
-        HomeFragmentDirections.ActionHomeFragmentToCategoryMealFragment action=HomeFragmentDirections
-                .actionHomeFragmentToCategoryMealFragment(categoriesItem.getStrCategory()) ;
-        Navigation.findNavController(requireView()).navigate(action);
-
-    }
-
-    private void navigateToMealDetailsFragment() {
-           HomeFragmentDirections.ActionHomeFragmentToMealDetailsFragment action =
-                   HomeFragmentDirections.actionHomeFragmentToMealDetailsFragment(mealItem);
-           Navigation.findNavController(requireView()).navigate(action);
     }
 
     @Override
     public void showSuccessMessage(RandomMealResponse.MealsItem mealsItem) {
-        this.mealItem=mealsItem;
-        mealTitle.setText(mealsItem.getStrMeal());
-        Log.e("TAG", "showSuccessMessage: "+mealsItem.getStrImageSource());
-        GlideImage.downloadImageToImageView(mealImg.getContext(),mealsItem.getStrMealThumb(),mealImg);
+
 
     }
 
+    private void navigateToCategoryMeal(String categoriesItem) {
+        SearchFragmentDirections.ActionSearchFragment2ToCategoryMealFragment action=SearchFragmentDirections
+                .actionSearchFragment2ToCategoryMealFragment(categoriesItem) ;
+        Navigation.findNavController(requireView()).navigate(action);
+
+    }
     @Override
     public void showErrorMessage(String error) {
         AlertMessage.showToastMessage(error,this.getContext());
-        hideProgressBar(progressBar);
+        //hideProgressBar(progressBar);
     }
 
     @Override
     public void showCategorySuccessMessage(List<CategoryResponse.CategoriesItem> categoriesItems) {
         categoryAdapter.changeData(categoriesItems);
-        hideProgressBar(progressBar);
+      //  hideProgressBar(progressBar);
     }
 
     @Override
@@ -123,7 +133,7 @@ public class HomeFragment extends Fragment implements HomeView{
         AlertMessage.showToastMessage(error,this.getContext());
     }
     void hideProgressBar(ProgressBar progressBar){
-        progressBar.setVisibility(View.INVISIBLE);
+       // progressBar.setVisibility(View.INVISIBLE);
     }
 
 }
