@@ -10,6 +10,8 @@ public interface MealRepo {
    void getRandomMeal(MealCallBack mealCallBack);
    Completable addMealToFavorite(RandomMealResponse.MealsItem mealsItem);
    Flowable getFavMeals();
+   Flowable getPlannedMealsByDate(String date);
    Completable deleteMealFromFav(RandomMealResponse.MealsItem mealItem);
+   Completable addMealToWeeklyPlay(RandomMealResponse.MealsItem mealsItem);
 
 }

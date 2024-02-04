@@ -20,9 +20,15 @@ public interface MealDao {
     Flowable<List<RandomMealResponse.MealsItem>> getAllFavMeals();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    Completable insertMealToFavorite(RandomMealResponse.MealsItem product);
+    Completable insertMealToFavorite(RandomMealResponse.MealsItem mealsItem);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    Completable addMealToPlan(MealsItem mealsItem);
     @Delete
-    Completable deleteMealFromFavorite(RandomMealResponse.MealsItem product);
+    Completable deleteMealFromFavorite(RandomMealResponse.MealsItem mealsItem);
+
+    @Query("select * from mealItem where dateModified = :date")
+    Flowable<List<MealsItem>> getPlannedMealsByDate(String date);
 
 
 }
