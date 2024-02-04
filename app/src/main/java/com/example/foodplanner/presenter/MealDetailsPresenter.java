@@ -8,8 +8,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public interface MealDetailsPresenter {
-    public void addMealToFavorite(RandomMealResponse.MealsItem mealsItem);
-    public void deleteFavMeals(RandomMealResponse.MealsItem mealItem);
+     void addMealToFavorite(RandomMealResponse.MealsItem mealsItem);
+     void deleteFavMeals(RandomMealResponse.MealsItem mealItem);
+     void addMealToWeeklyPlan(RandomMealResponse.MealsItem mealsItem);
+
 
 
     public class MealDetailsPresenterImp implements MealDetailsPresenter{
@@ -30,8 +32,6 @@ public interface MealDetailsPresenter {
 
         @Override
         public void deleteFavMeals(RandomMealResponse.MealsItem mealItem) {
-            // mealRepo.deleteMealFromFav(mealItem).subscribe(()->favoriteView.onSuccessDeleteFromFav(),error->favoriteView.onFailDeleteFromFav(error.getLocalizedMessage()));
-
             mealRepo.deleteMealFromFav(mealItem)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -40,6 +40,12 @@ public interface MealDetailsPresenter {
                             error -> mealDetailsView.onFailDeleteFromFav(error.getLocalizedMessage())
                     );
 
+        }
+
+        @Override
+        public void addMealToWeeklyPlan(RandomMealResponse.MealsItem mealsItem) {
+            mealRepo.addMealToWeeklyPlay(mealsItem)
+                    .subscribe(()->mealDetailsView.onPlanMealSuccess(),error->mealDetailsView.onPlanMealFail(error.getLocalizedMessage()));
         }
     }
 

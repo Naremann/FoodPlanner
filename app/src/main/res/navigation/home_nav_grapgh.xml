@@ -60,7 +60,7 @@
     </fragment>
     <fragment
         android:id="@+id/calenderFragment"
-        android:name="com.example.foodplanner.CalenderFragment"
+        android:name="com.example.foodplanner.view.calender.CalenderFragment"
         android:label="fragment_calender"
         tools:layout="@layout/fragment_calender" />
 </navigation>

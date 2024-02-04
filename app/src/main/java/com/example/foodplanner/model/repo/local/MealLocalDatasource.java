@@ -16,6 +16,9 @@ public interface MealLocalDatasource {
     Completable insertProductToFavorite(RandomMealResponse.MealsItem mealsItem);
     Completable deleteFavoriteProduct(RandomMealResponse.MealsItem mealsItem);
     Flowable<List<RandomMealResponse.MealsItem>> getFavMeals();
+    Flowable<List<RandomMealResponse.MealsItem>> getPlannedMealByDate(String date);
+
+    Completable addMealToWeekPlan(RandomMealResponse.MealsItem mealsItem);
 
     public class MealLocalDataSourceImp implements MealLocalDatasource {
         private MealDao mealDao;
@@ -38,6 +41,18 @@ public interface MealLocalDatasource {
         public Flowable<List<RandomMealResponse.MealsItem>> getFavMeals() {
             return favProducts;
         }
+
+        @Override
+        public Flowable<List<RandomMealResponse.MealsItem>> getPlannedMealByDate(String date) {
+            return mealDao.getPlannedMealsByDate(date);
+        }
+
+        @Override
+        public Completable addMealToWeekPlan(RandomMealResponse.MealsItem mealsItem) {
+            return mealDao.addMealToPlan(mealsItem).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+        }
+
         @Override
         public Completable deleteFavoriteProduct(RandomMealResponse.MealsItem mealsItem){
             return mealDao.deleteMealFromFavorite(mealsItem).

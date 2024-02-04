@@ -2,6 +2,8 @@ package com.example.foodplanner.view.meal_details;
 
 import static com.example.foodplanner.model.dto.Ingredient.getIngredients;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,9 +17,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
@@ -33,20 +38,22 @@ import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.view.meal_by_category.CategoryMealFragmentArgs;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MealDetailsFragment extends Fragment implements MealDetailsView{
     TextView mealTitle,mealCategory, mealArea;
-    ImageView mealImg,fillHeartImg,emptyHeartImg;
+    ImageView mealImg,fillHeartImg,emptyHeartImg,planImg;
     RecyclerView ingredientRecyclerView;
     RandomMealResponse.MealsItem mealsItem=null;
     IngredientAdapter ingredientAdapter;
-    Ingredient ingredient;
     List<Ingredient> ingredients;
     WebView webView;
     ProgressBar videoProgressBar;
     MealDetailsPresenter mealDetailsPresenter;
     boolean isFavorite;
+    Button sundayButton,mondayButton ,tuesdayButton,wednesdayButton,thursdayButton, fridayButton, saturdayButton;
+
 
 
 
@@ -64,9 +71,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mealDetailsPresenter=new MealDetailsPresenter.
-                MealDetailsPresenterImp(new MealRepoImp(new RandomMealRemoteDataSourceImp(), new
-                MealLocalDatasource.MealLocalDataSourceImp(this.requireContext())),this);
+        initDependencies();
         initViews(view);
         if (getArguments() != null) {
             mealsItem = MealDetailsFragmentArgs.fromBundle(getArguments()).getMeal();
@@ -106,9 +111,21 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
 
     }
 
+    private void initDependencies() {
+        mealDetailsPresenter=new MealDetailsPresenter.
+                MealDetailsPresenterImp(new MealRepoImp(new RandomMealRemoteDataSourceImp(), new
+                MealLocalDatasource.MealLocalDataSourceImp(this.requireContext())),this);
+    }
 
 
     private void initViews(View view) {
+        planImg=view.findViewById(R.id.calender);
+        planImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDaySelectorDialog();
+            }
+        });
         emptyHeartImg=view.findViewById(R.id.empty_heart);
         fillHeartImg=view.findViewById(R.id.filled_heart);
         mealTitle=view.findViewById(R.id.title_tv);
@@ -125,11 +142,6 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
         ingredientRecyclerView.setAdapter(ingredientAdapter);
     }
 
-    /*public void displayData(RandomMealResponse.MealsItem mealsItem) {
-        Log.e("TAG1", "displayData: " + mealsItem.getStrArea());
-        this.mealsItem = mealsItem;
-    }*/
-
 
 
     private void setMealDataInViews(RandomMealResponse.MealsItem mealsItem)  {
@@ -138,6 +150,46 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
         mealArea.setText(mealsItem.getStrArea());
         GlideImage.downloadImageToImageView(this.getContext(), mealsItem.getStrMealThumb(), mealImg);
          YouTubeVideo.loadVideoUrlInWebView(webView, mealsItem.getStrYoutube(),videoProgressBar);
+    }
+
+
+
+    private void showDaySelectorDialog() {
+        // Create the custom dialog
+        final Dialog dialog = new Dialog(this.requireContext());
+        dialog.setContentView(R.layout.dialog_day_selector);
+        dialog.setTitle("Select Day");
+         sundayButton = dialog.findViewById(R.id.sundayButton);
+         mondayButton = dialog.findViewById(R.id.mondayButton);
+         tuesdayButton = dialog.findViewById(R.id.tuesdayButton);
+         wednesdayButton = dialog.findViewById(R.id.wednesdayButton);
+         thursdayButton = dialog.findViewById(R.id.thursdayButton);
+         fridayButton = dialog.findViewById(R.id.fridayButton);
+         saturdayButton = dialog.findViewById(R.id.saturdayButton);
+
+        // Set up click listeners
+        View.OnClickListener dayClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String selectedDay = ((Button) v).getText().toString();
+                // Handle the selected day here
+                mealsItem.setDateModified(selectedDay);
+                mealDetailsPresenter.addMealToWeeklyPlan(mealsItem);
+                Toast.makeText(getContext(), "Selected day: " + selectedDay, Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        };
+
+        sundayButton.setOnClickListener(dayClickListener);
+        mondayButton.setOnClickListener(dayClickListener);
+        tuesdayButton.setOnClickListener(dayClickListener);
+        wednesdayButton.setOnClickListener(dayClickListener);
+        thursdayButton.setOnClickListener(dayClickListener);
+        fridayButton.setOnClickListener(dayClickListener);
+        saturdayButton.setOnClickListener(dayClickListener);
+
+        // Show the dialog
+        dialog.show();
     }
 
     @Override
@@ -151,12 +203,28 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
     }
 
     @Override
+    public void onPlanMealSuccess() {
+        AlertMessage.showToastMessage("Saved to meal plan",this.getContext());
+    }
+
+    @Override
+    public void onPlanMealFail(String error) {
+        showFailMessage(error);
+       // AlertMessage.showToastMessage(error,this.getContext());
+    }
+
+    @Override
     public void onSuccessDeleteFromFav() {
-        AlertMessage.showToastMessage("Meal deleted to favorite",this.getContext());
+        AlertMessage.showToastMessage("Meal deleted from favorite",this.getContext());
     }
 
     @Override
     public void onFailDeleteFromFav(String error) {
+        showFailMessage(error);
+        //AlertMessage.showToastMessage(error,this.getContext());
+    }
+
+    void showFailMessage(String error){
         AlertMessage.showToastMessage(error,this.getContext());
     }
 

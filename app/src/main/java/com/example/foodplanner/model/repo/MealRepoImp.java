@@ -33,8 +33,18 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
+    public Flowable getPlannedMealsByDate(String date) {
+        return mealLocalDataSource.getPlannedMealByDate(date);
+    }
+
+    @Override
     public Completable deleteMealFromFav(RandomMealResponse.MealsItem mealItem) {
         return mealLocalDataSource.deleteFavoriteProduct(mealItem);
+    }
+
+    @Override
+    public Completable addMealToWeeklyPlay(RandomMealResponse.MealsItem mealsItem) {
+        return mealLocalDataSource.addMealToWeekPlan(mealsItem);
     }
 
 
