@@ -26,6 +26,7 @@ import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.CategoryRemoteDataSourceImp;
 import com.example.foodplanner.model.repo.remote.CategoryRepo;
+import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.home.HomePresenter;
 import com.example.foodplanner.presenter.home.HomePresenterImp;
@@ -66,7 +67,9 @@ public class SearchFragment extends Fragment implements HomeView {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homePresenter=new HomePresenterImp(this,
-                new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.getContext())),
+                new MealRepoImp(
+                        new RandomMealRemoteDataSourceImp(),
+                        new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()),new MealRemoteDataSource.MealRemoteDataSourceImp()),
                 new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()));
         homePresenter.getCategories();
         intiViews(view);

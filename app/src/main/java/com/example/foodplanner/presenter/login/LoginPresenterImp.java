@@ -19,6 +19,7 @@ public class LoginPresenterImp implements LoginPresenter{
         FirebaseUtils.signIn(email, password, task -> {
             if(task.isSuccessful()){
                 Constants.CURRENT_USER= FirebaseUtils.getFirebaseInstance().getCurrentUser();
+              //  Constants.EMAIL=email;
                 loginView.showSuccessMessage();
             }
             else{

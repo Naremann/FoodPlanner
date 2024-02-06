@@ -20,6 +20,8 @@ public class RandomMealResponse{
 	@Entity(tableName = "mealItem")
 	public static class MealsItem implements Serializable {
 
+		public static final String COLLECTION_NAME="Meal";
+
 		@SerializedName("strImageSource")
 		private String strImageSource;
 

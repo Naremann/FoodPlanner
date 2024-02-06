@@ -4,6 +4,8 @@ import static com.example.foodplanner.model.dto.Ingredient.getIngredients;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.foodplanner.Constants;
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.YouTubeVideo;
@@ -32,8 +35,10 @@ import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
+import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.MealDetailsPresenter;
+import com.example.foodplanner.presenter.MealPresenter;
 import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.view.meal_by_category.CategoryMealFragmentArgs;
 
@@ -50,7 +55,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
     List<Ingredient> ingredients;
     WebView webView;
     ProgressBar videoProgressBar;
-    MealDetailsPresenter mealDetailsPresenter;
+    MealDetailsPresenter mealDetailsPresenter,mealDetailsPresenter2;
     boolean isFavorite;
     Button sundayButton,mondayButton ,tuesdayButton,wednesdayButton,thursdayButton, fridayButton, saturdayButton;
 
@@ -104,6 +109,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
         if(mealsItem!=null){
             Log.e("TAG", "onViewCreated1: "+    mealsItem.getStrIngredient1());
             getIngredients(mealsItem);
+
             ingredientAdapter.changeData(getIngredients(mealsItem));
             Log.e("TAG1", "onViewCreated: "+mealsItem.getStrCategory());
             setMealDataInViews(mealsItem);
@@ -114,7 +120,9 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
     private void initDependencies() {
         mealDetailsPresenter=new MealDetailsPresenter.
                 MealDetailsPresenterImp(new MealRepoImp(new RandomMealRemoteDataSourceImp(), new
-                MealLocalDatasource.MealLocalDataSourceImp(this.requireContext())),this);
+                MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()),new MealRemoteDataSource.MealRemoteDataSourceImp()),this);
+
+
     }
 
 
@@ -155,7 +163,6 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
 
 
     private void showDaySelectorDialog() {
-        // Create the custom dialog
         final Dialog dialog = new Dialog(this.requireContext());
         dialog.setContentView(R.layout.dialog_day_selector);
         dialog.setTitle("Select Day");
@@ -166,20 +173,20 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
          thursdayButton = dialog.findViewById(R.id.thursdayButton);
          fridayButton = dialog.findViewById(R.id.fridayButton);
          saturdayButton = dialog.findViewById(R.id.saturdayButton);
+         View.OnClickListener dayClickListener = v -> {
+            String selectedDay = ((Button) v).getText().toString();
+            mealsItem.setDateModified(selectedDay);
 
-        // Set up click listeners
-        View.OnClickListener dayClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String selectedDay = ((Button) v).getText().toString();
-                // Handle the selected day here
-                mealsItem.setDateModified(selectedDay);
-                mealDetailsPresenter.addMealToWeeklyPlan(mealsItem);
-                Toast.makeText(getContext(), "Selected day: " + selectedDay, Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-            }
+             SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+             String savedEmail = sharedPreferences.getString("email", "");
+            // Constants.EMAIL = savedEmail;
+             mealsItem.setStrCreativeCommonsConfirmed(savedEmail);
+             Log.e("TAG", "email: "+savedEmail);
+            mealDetailsPresenter.addMealToWeeklyPlan(mealsItem);
+            mealDetailsPresenter.addWeeklyPlayMealToFireStore(mealsItem);
+            //Toast.makeText(getContext(), "Selected day: " + selectedDay, Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
         };
-
         sundayButton.setOnClickListener(dayClickListener);
         mondayButton.setOnClickListener(dayClickListener);
         tuesdayButton.setOnClickListener(dayClickListener);
@@ -187,8 +194,6 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
         thursdayButton.setOnClickListener(dayClickListener);
         fridayButton.setOnClickListener(dayClickListener);
         saturdayButton.setOnClickListener(dayClickListener);
-
-        // Show the dialog
         dialog.show();
     }
 
@@ -204,7 +209,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
 
     @Override
     public void onPlanMealSuccess() {
-        AlertMessage.showToastMessage("Saved to meal plan",this.getContext());
+        AlertMessage.showToastMessage("Saved to meal plan",requireContext());
     }
 
     @Override

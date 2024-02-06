@@ -19,6 +19,7 @@ import com.example.foodplanner.db.SharedPreferencesManager;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
+import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.FavMealPresenter;
 import com.example.foodplanner.view.AlertMessage;
@@ -49,7 +50,7 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         favMealPresenter=new FavMealPresenter.FavMealPresenterImp(new MealRepoImp(new RandomMealRemoteDataSourceImp(),
-                new MealLocalDatasource.MealLocalDataSourceImp(this.requireContext())),this);
+                new MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()),new MealRemoteDataSource.MealRemoteDataSourceImp()),this);
         favMealPresenter.getMeals();
         initViews(view);
     }

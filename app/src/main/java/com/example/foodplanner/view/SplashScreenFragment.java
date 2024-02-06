@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,13 +96,26 @@ public class SplashScreenFragment extends Fragment {
     }
 
     private void checkUserAuthentication() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            Intent intent = new Intent(getContext(), HomeActivity.class);
-            startActivity(intent);
+        if (isAdded() && getContext() != null) {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                Intent intent = new Intent(getContext(), HomeActivity.class);
+                startActivity(intent);
+            } else {
+                navigateLoginFragment();
+            }
         } else {
-            navigateLoginFragment();
+            // Handle the case where the fragment is not attached or the context is null
+            Log.e("TAG", "Fragment not attached or context is null in checkUserAuthentication");
         }
+            /*FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                Intent intent = new Intent(this.requireContext(), HomeActivity.class);
+                startActivity(intent);
+            } else {
+                navigateLoginFragment();
+            }*/
+
     }
 
 

@@ -22,6 +22,7 @@ import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.CategoryRemoteDataSourceImp;
 import com.example.foodplanner.model.repo.remote.CategoryRepo;
+import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
@@ -61,7 +62,7 @@ public class HomeFragment extends Fragment implements HomeView{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homePresenter=new HomePresenterImp(this,
-                new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.getContext())),
+                new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()),new MealRemoteDataSource.MealRemoteDataSourceImp()),
                 new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()));
         homePresenter.getRandomMeal();
         homePresenter.getCategories();
