@@ -20,4 +20,17 @@ public class SharedPreferencesManager {
     public static boolean loadFavoriteStatus(Context context, String mealId) {
         return getSharedPreferences(context).getBoolean(FAVORITE_KEY + mealId, false);
     }
+
+
+    public static void saveUserEmail(Context context,String email){
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putString("email", email);
+        editor.apply();
+    }
+
+    public static String getUserEmail(Context context){
+        return getSharedPreferences(context).getString("email","");
+    }
+
+
 }

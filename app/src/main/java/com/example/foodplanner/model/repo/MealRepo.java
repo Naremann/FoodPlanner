@@ -21,7 +21,14 @@ public interface MealRepo {
    Completable deleteMealFromFav(RandomMealResponse.MealsItem mealItem);
    Completable addMealToWeeklyPlay(RandomMealResponse.MealsItem mealsItem);
 
+   void addMealToFav(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
+
    void addMealToWeeklyPlay(RandomMealResponse.MealsItem mealsItem, String email, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
    Observable<List<RandomMealResponse.MealsItem>> getWeeklyPlannedMealsObservable(String date);
 
-}
+
+    Flowable<List<RandomMealResponse.MealsItem>> getAllFavMeals();
+    Completable deleteFromRemoteAndLocal(RandomMealResponse.MealsItem mealsItem);
+
+
+   }

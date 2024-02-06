@@ -9,5 +9,7 @@ public interface FavoriteView {
     public void onFailDeleteFromFav(String error);
     void onGetAllFavoriteMeals(List<MealsItem> favoriteMeals);
     void onGetAllFavoriteMealsError(String errorMessage);
+    void onGetAllFavoriteFireStoreMeals(List<MealsItem> favoriteMeals);
+    void onGetAllFavoriteFireStoreMealsError(String errorMessage);
 
 }

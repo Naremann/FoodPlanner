@@ -50,7 +50,7 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         favMealPresenter=new FavMealPresenter.FavMealPresenterImp(new MealRepoImp(new RandomMealRemoteDataSourceImp(),
-                new MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()),new MealRemoteDataSource.MealRemoteDataSourceImp()),this);
+                new MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()),new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())),this);
         favMealPresenter.getMeals();
         initViews(view);
     }
@@ -89,7 +89,18 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
 
     @Override
     public void onGetAllFavoriteMealsError(String errorMessage) {
-        AlertMessage.showToastMessage(errorMessage,this.requireContext());
+        showErrorMsg(errorMessage);
+    }
+
+    @Override
+    public void onGetAllFavoriteFireStoreMeals(List<RandomMealResponse.MealsItem> favoriteMeals) {
+        favMealAdapter.changeData(favoriteMeals);
+    }
+
+    @Override
+    public void onGetAllFavoriteFireStoreMealsError(String errorMessage) {
+        showErrorMsg(errorMessage);
+
     }
 
 
@@ -98,5 +109,9 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
                 .actionFavoriteMealsFragmentToMealDetailsFragment(mealsItems) ;
         Navigation.findNavController(requireView()).navigate(action);
 
+    }
+
+    private void showErrorMsg(String error){
+        AlertMessage.showToastMessage(error,this.requireContext());
     }
 }

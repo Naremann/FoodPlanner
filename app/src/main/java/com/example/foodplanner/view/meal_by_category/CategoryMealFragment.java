@@ -50,7 +50,7 @@ public class CategoryMealFragment extends Fragment implements MealByCategoryView
 
     private void initializeDependencies() {
         mealPresenter = new MealPresenter.MealPresenterImp(
-                new MealRemoteDataSource.MealRemoteDataSourceImp(),
+                new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext()),
                 this
         );
     }
