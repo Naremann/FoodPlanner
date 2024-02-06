@@ -70,13 +70,13 @@ public class CalenderFragment extends Fragment implements CalenderView{
         calenderPresenter.getPlannedMealsByDate("Wed");
         calenderPresenter.getPlannedMealsByDate("Thu");
         calenderPresenter.getPlannedMealsByDate("Fri");
-        calenderPresenter.getWeeklyPlannedMealsFirestore("Mon");
+      /*  calenderPresenter.getWeeklyPlannedMealsFirestore("Mon");
         calenderPresenter.getWeeklyPlannedMealsFirestore("Sat");
         calenderPresenter.getWeeklyPlannedMealsFirestore("Tue");
         calenderPresenter.getWeeklyPlannedMealsFirestore("Sun");
         calenderPresenter.getWeeklyPlannedMealsFirestore("Wed");
         calenderPresenter.getWeeklyPlannedMealsFirestore("Thu");
-        calenderPresenter.getWeeklyPlannedMealsFirestore("Fri");
+        calenderPresenter.getWeeklyPlannedMealsFirestore("Fri");*/
 
 
 
@@ -137,7 +137,7 @@ public class CalenderFragment extends Fragment implements CalenderView{
         showErrorMessage(errorMessage);
     }
 
-    @Override
+    /*@Override
     public void showWeeklyPlannedMeals(List<RandomMealResponse.MealsItem> mealsItems,String date) {
         List<RandomMealResponse.MealsItem> filteredMeals = new ArrayList<>();
 
@@ -173,12 +173,12 @@ public class CalenderFragment extends Fragment implements CalenderView{
                 recyclerViewFri.setAdapter(new CalenderAdapter(filteredMeals));
                 break;
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void showPlannedMealsErrorFireStore(String error) {
         showErrorMsg(error);
-    }
+    }*/
 
     @Override
     public void onInsertFavSuccess() {

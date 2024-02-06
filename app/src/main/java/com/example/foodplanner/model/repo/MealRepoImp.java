@@ -2,8 +2,6 @@ package com.example.foodplanner.model.repo;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
@@ -12,13 +10,13 @@ import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.List;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MealRepoImp implements MealRepo{
     RandomMealRemoteDataSource randomMealRemoteDataSource;
@@ -31,10 +29,6 @@ public class MealRepoImp implements MealRepo{
         this.mealRemoteDataSource=mealRemoteDataSource;
     }
 
-    public MealRepoImp(MealLocalDatasource mealLocalDataSource, MealRemoteDataSource mealRemoteDataSource) {
-        this.mealLocalDataSource = mealLocalDataSource;
-        this.mealRemoteDataSource = mealRemoteDataSource;
-    }
 
     @Override
     public void getRandomMeal(MealCallBack mealCallBack) {
@@ -76,7 +70,6 @@ public class MealRepoImp implements MealRepo{
         mealRemoteDataSource.addMealToPlan(mealsItem,onSuccessListener,onFailureListener);
     }
 
-
     @Override
     public Observable<List<RandomMealResponse.MealsItem>> getWeeklyPlannedMealsObservable(String date) {
         return mealRemoteDataSource.getWeeklyPlannedMealsObservable(date)
@@ -106,6 +99,22 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
+    public Flowable<List<RandomMealResponse.MealsItem>> getAllPlannedMeals(String date) {
+        return mealLocalDataSource.getPlannedMealByDate(date)
+                .flatMap(mealsItems -> {
+                    if(mealsItems.isEmpty()){
+                       return fetchAndSavePlannedMealsFromRemote(date);
+                    }
+                    else {
+                        return Flowable.just(mealsItems);
+                    }
+                })
+                ;
+    }
+
+
+
+    @Override
     public Completable deleteFromRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
         Completable deleteFromRemote=Completable.create(emitter -> {
             mealRemoteDataSource.deleteFavoriteMealFromFireStore(mealsItem, unused -> {
@@ -116,6 +125,32 @@ public class MealRepoImp implements MealRepo{
         });
         Completable deleteFromLocal=mealLocalDataSource.deleteFavoriteProduct(mealsItem);
         return Completable.mergeArray(deleteFromRemote,deleteFromLocal);
+    }
+
+    @Override
+    public Completable insertMealToFavRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+        Completable insertRemote=Completable.create(emitter -> {
+            mealRemoteDataSource.addMealToFav(mealsItem, unused -> {
+                emitter.onComplete();
+            }, e -> {
+                emitter.onError(new IllegalStateException(e.getLocalizedMessage()));
+            });
+        });
+        Completable insertLocal=mealLocalDataSource.insertProductToFavorite(mealsItem);
+        return Completable.mergeArray(insertRemote,insertLocal);
+    }
+
+    @Override
+    public Completable insertMealToWeeklyPlanRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+       Completable insertRemote=Completable.create(emitter -> {
+           mealRemoteDataSource.addMealToPlan(mealsItem, unused -> {
+               emitter.onComplete();
+           }, e -> {
+               emitter.onError(new IllegalStateException(e.getLocalizedMessage()));
+           });
+       });
+       Completable insertLocal=mealLocalDataSource.addMealToWeekPlan(mealsItem);
+       return Completable.mergeArray(insertRemote,insertLocal);
     }
 
     private Flowable<List<RandomMealResponse.MealsItem>> fetchAndSaveFavMealsFromRemote() {
@@ -131,6 +166,19 @@ public class MealRepoImp implements MealRepo{
                 })
                 .andThen(mealLocalDataSource.getFavMeals());
     }
+    @Override
+    public Flowable<List<RandomMealResponse.MealsItem>> fetchAndSavePlannedMealsFromRemote(String date) {
+        return mealRemoteDataSource.getWeeklyPlannedMealsObservable(date)
+                .flatMapCompletable(mealsItems -> {
+                    Completable insertCompletable = Completable.complete();
+                    for (RandomMealResponse.MealsItem mealsItem : mealsItems) {
+                        insertCompletable = insertCompletable.andThen(mealLocalDataSource.addMealToWeekPlan(mealsItem));
+                    }
+                    return insertCompletable.andThen(Completable.fromAction(() -> {
+                    }));
+                }).andThen(mealLocalDataSource.getPlannedMealByDate(date));
+    }
+
 
 
 }

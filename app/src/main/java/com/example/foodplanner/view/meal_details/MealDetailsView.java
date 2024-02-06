@@ -8,7 +8,4 @@ public interface MealDetailsView {
      void onSuccessDeleteFromFav();
      void onFailDeleteFromFav(String error);
 
-
-    void onAddToFavSuccessFB();
-    void onAddToFavFailFB(String error);
 }

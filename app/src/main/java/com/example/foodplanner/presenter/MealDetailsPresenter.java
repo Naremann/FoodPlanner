@@ -13,15 +13,17 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public interface MealDetailsPresenter {
-     void addMealToFavorite(RandomMealResponse.MealsItem mealsItem);
-     void deleteFavMeals(RandomMealResponse.MealsItem mealItem);
-     void addMealToWeeklyPlan(RandomMealResponse.MealsItem mealsItem);
-     void addWeeklyPlayMealToFireStore(RandomMealResponse.MealsItem mealsItem);
-    void addMealToFavFireStore(RandomMealResponse.MealsItem mealsItem);
+    void addMealToFavorite(RandomMealResponse.MealsItem mealsItem);
+
+    void deleteFavMeals(RandomMealResponse.MealsItem mealItem);
+
+    void addMealToWeeklyPlan(RandomMealResponse.MealsItem mealsItem);
+
+    void addWeeklyPlayMealToFireStore(RandomMealResponse.MealsItem mealsItem);
+    //void addMealToFavFireStore(RandomMealResponse.MealsItem mealsItem);
 
 
-
-     class MealDetailsPresenterImp implements MealDetailsPresenter{
+    class MealDetailsPresenterImp implements MealDetailsPresenter {
         MealRepo mealRepo;
         MealDetailsView mealDetailsView;
 
@@ -32,27 +34,40 @@ public interface MealDetailsPresenter {
 
         @Override
         public void addMealToFavorite(RandomMealResponse.MealsItem mealsItem) {
-            mealRepo.addMealToFavorite(mealsItem).
+
+            mealRepo.insertMealToFavRemoteAndLocal(mealsItem).
+                    subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            () -> mealDetailsView.onInsertFavSuccess(),
+                            error -> mealDetailsView.onInsertFavError(error.getLocalizedMessage()));
+
+            /*mealRepo.addMealToFavorite(mealsItem).
                     subscribe(()->mealDetailsView.onInsertFavSuccess(),
-                            error->mealDetailsView.onInsertFavError(error.getLocalizedMessage()));
+                            error->mealDetailsView.onInsertFavError(error.getLocalizedMessage()));*/
         }
 
         @Override
         public void deleteFavMeals(RandomMealResponse.MealsItem mealItem) {
-            mealRepo.deleteMealFromFav(mealItem)
+            mealRepo.deleteFromRemoteAndLocal(mealItem)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             () -> mealDetailsView.onSuccessDeleteFromFav(),
                             error -> mealDetailsView.onFailDeleteFromFav(error.getLocalizedMessage())
                     );
-
         }
 
         @Override
         public void addMealToWeeklyPlan(RandomMealResponse.MealsItem mealsItem) {
-            mealRepo.addMealToWeeklyPlay(mealsItem)
-                    .subscribe(()->mealDetailsView.onPlanMealSuccess(),error->mealDetailsView.onPlanMealFail(error.getLocalizedMessage()));
+            mealRepo.insertMealToWeeklyPlanRemoteAndLocal(mealsItem).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            () -> mealDetailsView.onPlanMealSuccess(),
+                            error -> mealDetailsView.onPlanMealFail(error.getLocalizedMessage()));
+
+            /*mealRepo.addMealToWeeklyPlay(mealsItem)
+                    .subscribe(() -> mealDetailsView.onPlanMealSuccess(), error -> mealDetailsView.onPlanMealFail(error.getLocalizedMessage()));*/
         }
 
         @Override
@@ -62,13 +77,14 @@ public interface MealDetailsPresenter {
                     e -> mealDetailsView.onPlanMealFail(e.getLocalizedMessage()));
         }
 
-         @Override
+         /*@Override
          public void addMealToFavFireStore(RandomMealResponse.MealsItem mealsItem) {
              mealRepo.addMealToFav(mealsItem, unused -> {
                  mealDetailsView.onAddToFavSuccessFB();
                  mealRepo.addMealToFavorite(mealsItem);
              }, e -> mealDetailsView.onAddToFavFailFB(e.getLocalizedMessage()));
          }
-     }
+     }*/
 
+    }
 }
