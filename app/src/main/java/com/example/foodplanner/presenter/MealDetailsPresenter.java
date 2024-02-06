@@ -17,6 +17,7 @@ public interface MealDetailsPresenter {
      void deleteFavMeals(RandomMealResponse.MealsItem mealItem);
      void addMealToWeeklyPlan(RandomMealResponse.MealsItem mealsItem);
      void addWeeklyPlayMealToFireStore(RandomMealResponse.MealsItem mealsItem);
+    void addMealToFavFireStore(RandomMealResponse.MealsItem mealsItem);
 
 
 
@@ -57,8 +58,17 @@ public interface MealDetailsPresenter {
         @Override
         public void addWeeklyPlayMealToFireStore(RandomMealResponse.MealsItem mealsItem) {
             mealRepo.addMealToWeeklyPlay(mealsItem, Constants.EMAIL,
-                    unused -> mealDetailsView.onPlanMealSuccess(), e -> mealDetailsView.onPlanMealFail(e.getLocalizedMessage()));
+                    unused -> mealDetailsView.onPlanMealSuccess(),
+                    e -> mealDetailsView.onPlanMealFail(e.getLocalizedMessage()));
         }
-    }
+
+         @Override
+         public void addMealToFavFireStore(RandomMealResponse.MealsItem mealsItem) {
+             mealRepo.addMealToFav(mealsItem, unused -> {
+                 mealDetailsView.onAddToFavSuccessFB();
+                 mealRepo.addMealToFavorite(mealsItem);
+             }, e -> mealDetailsView.onAddToFavFailFB(e.getLocalizedMessage()));
+         }
+     }
 
 }

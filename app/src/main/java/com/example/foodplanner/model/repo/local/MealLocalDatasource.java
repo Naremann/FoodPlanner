@@ -20,7 +20,10 @@ public interface MealLocalDatasource {
 
     Completable addMealToWeekPlan(RandomMealResponse.MealsItem mealsItem);
 
-    public class MealLocalDataSourceImp implements MealLocalDatasource {
+
+
+
+     class MealLocalDataSourceImp implements MealLocalDatasource {
         private MealDao mealDao;
         private Flowable<List<RandomMealResponse.MealsItem>> favProducts;
         private static MealLocalDataSourceImp productRepoImp =null;
@@ -49,6 +52,7 @@ public interface MealLocalDatasource {
 
         @Override
         public Completable addMealToWeekPlan(RandomMealResponse.MealsItem mealsItem) {
+            mealsItem.setFavorite(false);
             return mealDao.addMealToPlan(mealsItem).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
         }
@@ -58,13 +62,12 @@ public interface MealLocalDatasource {
             return mealDao.deleteMealFromFavorite(mealsItem).
                     subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
-           /* new Thread(() -> mealDao.deleteMealFromFavorite(product)){
-            }.start();*/
         }
 
 
         @Override
         public Completable insertProductToFavorite(RandomMealResponse.MealsItem mealItem){
+            mealItem.setFavorite(true);
             return mealDao.insertMealToFavorite(mealItem)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());

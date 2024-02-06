@@ -46,21 +46,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class MealDetailsFragment extends Fragment implements MealDetailsView{
-    TextView mealTitle,mealCategory, mealArea;
-    ImageView mealImg,fillHeartImg,emptyHeartImg,planImg;
+public class MealDetailsFragment extends Fragment implements MealDetailsView {
+    TextView mealTitle, mealCategory, mealArea;
+    ImageView mealImg, fillHeartImg, emptyHeartImg, planImg;
     RecyclerView ingredientRecyclerView;
-    RandomMealResponse.MealsItem mealsItem=null;
+    RandomMealResponse.MealsItem mealsItem = null;
     IngredientAdapter ingredientAdapter;
     List<Ingredient> ingredients;
     WebView webView;
     ProgressBar videoProgressBar;
-    MealDetailsPresenter mealDetailsPresenter,mealDetailsPresenter2;
+    MealDetailsPresenter mealDetailsPresenter, mealDetailsPresenter2;
     boolean isFavorite;
-    Button sundayButton,mondayButton ,tuesdayButton,wednesdayButton,thursdayButton, fridayButton, saturdayButton;
-
-
-
+    Button sundayButton, mondayButton, tuesdayButton, wednesdayButton, thursdayButton, fridayButton, saturdayButton;
 
 
     public MealDetailsFragment() {
@@ -80,70 +77,60 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
         initViews(view);
         if (getArguments() != null) {
             mealsItem = MealDetailsFragmentArgs.fromBundle(getArguments()).getMeal();
-             isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext(),mealsItem.getIdMeal());
+            isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext(), mealsItem.getIdMeal());
             updateHeartIconVisibility();
-            Log.e("TAG", "onViewCreated: "+mealsItem.getStrArea());
-            emptyHeartImg.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                   // isFavorite=true;
-                    mealDetailsPresenter.addMealToFavorite(mealsItem);
-                    fillHeartImg.setVisibility(View.VISIBLE);
-                    emptyHeartImg.setVisibility(View.INVISIBLE);
-                    SharedPreferencesManager.saveFavoriteStatus(getContext(), true,mealsItem.getIdMeal());
+            Log.e("TAG", "onViewCreated: " + mealsItem.getStrArea());
+            emptyHeartImg.setOnClickListener(v -> {
+                mealsItem.setStrCreativeCommonsConfirmed(SharedPreferencesManager.getUserEmail(requireContext()));
+                mealsItem.setFavorite(true);
+                mealDetailsPresenter.addMealToFavFireStore(mealsItem);
+                mealDetailsPresenter.addMealToFavorite(mealsItem);
+                fillHeartImg.setVisibility(View.VISIBLE);
+                emptyHeartImg.setVisibility(View.INVISIBLE);
+                SharedPreferencesManager.saveFavoriteStatus(getContext(), true, mealsItem.getIdMeal());
 
-                }
             });
-            fillHeartImg.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                   // isFavorite=false;
-                    mealDetailsPresenter.deleteFavMeals(mealsItem);
-                    fillHeartImg.setVisibility(View.INVISIBLE);
-                    emptyHeartImg.setVisibility(View.VISIBLE);
-                    SharedPreferencesManager.saveFavoriteStatus(getContext(), false,mealsItem.getIdMeal());
-                }
+            fillHeartImg.setOnClickListener(v -> {
+                mealDetailsPresenter.deleteFavMeals(mealsItem);
+                fillHeartImg.setVisibility(View.INVISIBLE);
+                emptyHeartImg.setVisibility(View.VISIBLE);
+                SharedPreferencesManager.saveFavoriteStatus(getContext(), false, mealsItem.getIdMeal());
             });
         }
-        ingredients=new ArrayList<>();
-        if(mealsItem!=null){
-            Log.e("TAG", "onViewCreated1: "+    mealsItem.getStrIngredient1());
+        ingredients = new ArrayList<>();
+        if (mealsItem != null) {
+            Log.e("TAG", "onViewCreated1: " + mealsItem.getStrIngredient1());
             getIngredients(mealsItem);
 
             ingredientAdapter.changeData(getIngredients(mealsItem));
-            Log.e("TAG1", "onViewCreated: "+mealsItem.getStrCategory());
+            Log.e("TAG1", "onViewCreated: " + mealsItem.getStrCategory());
             setMealDataInViews(mealsItem);
         }
 
     }
 
     private void initDependencies() {
-        mealDetailsPresenter=new MealDetailsPresenter.
+        mealDetailsPresenter = new MealDetailsPresenter.
                 MealDetailsPresenterImp(new MealRepoImp(new RandomMealRemoteDataSourceImp(), new
-                MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()),new MealRemoteDataSource.MealRemoteDataSourceImp()),this);
+                MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()), new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())), this);
 
 
     }
 
 
     private void initViews(View view) {
-        planImg=view.findViewById(R.id.calender);
-        planImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDaySelectorDialog();
-            }
-        });
-        emptyHeartImg=view.findViewById(R.id.empty_heart);
-        fillHeartImg=view.findViewById(R.id.filled_heart);
-        mealTitle=view.findViewById(R.id.title_tv);
-        mealArea =view.findViewById(R.id.area_tv);
-        mealCategory=view.findViewById(R.id.category_tv);
-        mealImg=view.findViewById(R.id.meal_img);
-        webView=view.findViewById(R.id.web_view);
-        videoProgressBar=view.findViewById(R.id.video_progress_bar);
-        ingredientRecyclerView=view.findViewById(R.id.ingredient_recycler_view);
-        ingredientAdapter=new IngredientAdapter(new ArrayList<>());
+        planImg = view.findViewById(R.id.calender);
+        planImg.setOnClickListener(v -> showDaySelectorDialog());
+        emptyHeartImg = view.findViewById(R.id.empty_heart);
+        fillHeartImg = view.findViewById(R.id.filled_heart);
+        mealTitle = view.findViewById(R.id.title_tv);
+        mealArea = view.findViewById(R.id.area_tv);
+        mealCategory = view.findViewById(R.id.category_tv);
+        mealImg = view.findViewById(R.id.meal_img);
+        webView = view.findViewById(R.id.web_view);
+        videoProgressBar = view.findViewById(R.id.video_progress_bar);
+        ingredientRecyclerView = view.findViewById(R.id.ingredient_recycler_view);
+        ingredientAdapter = new IngredientAdapter(new ArrayList<>());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         ingredientRecyclerView.setLayoutManager(linearLayoutManager);
@@ -151,40 +138,34 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
     }
 
 
-
-    private void setMealDataInViews(RandomMealResponse.MealsItem mealsItem)  {
+    private void setMealDataInViews(RandomMealResponse.MealsItem mealsItem) {
         mealTitle.setText(mealsItem.getStrMeal());
         mealCategory.setText(mealsItem.getStrCategory());
         mealArea.setText(mealsItem.getStrArea());
         GlideImage.downloadImageToImageView(this.getContext(), mealsItem.getStrMealThumb(), mealImg);
-         YouTubeVideo.loadVideoUrlInWebView(webView, mealsItem.getStrYoutube(),videoProgressBar);
+        YouTubeVideo.loadVideoUrlInWebView(webView, mealsItem.getStrYoutube(), videoProgressBar);
     }
-
 
 
     private void showDaySelectorDialog() {
         final Dialog dialog = new Dialog(this.requireContext());
         dialog.setContentView(R.layout.dialog_day_selector);
         dialog.setTitle("Select Day");
-         sundayButton = dialog.findViewById(R.id.sundayButton);
-         mondayButton = dialog.findViewById(R.id.mondayButton);
-         tuesdayButton = dialog.findViewById(R.id.tuesdayButton);
-         wednesdayButton = dialog.findViewById(R.id.wednesdayButton);
-         thursdayButton = dialog.findViewById(R.id.thursdayButton);
-         fridayButton = dialog.findViewById(R.id.fridayButton);
-         saturdayButton = dialog.findViewById(R.id.saturdayButton);
-         View.OnClickListener dayClickListener = v -> {
+        sundayButton = dialog.findViewById(R.id.sundayButton);
+        mondayButton = dialog.findViewById(R.id.mondayButton);
+        tuesdayButton = dialog.findViewById(R.id.tuesdayButton);
+        wednesdayButton = dialog.findViewById(R.id.wednesdayButton);
+        thursdayButton = dialog.findViewById(R.id.thursdayButton);
+        fridayButton = dialog.findViewById(R.id.fridayButton);
+        saturdayButton = dialog.findViewById(R.id.saturdayButton);
+        View.OnClickListener dayClickListener = v -> {
             String selectedDay = ((Button) v).getText().toString();
             mealsItem.setDateModified(selectedDay);
-
-             SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-             String savedEmail = sharedPreferences.getString("email", "");
-            // Constants.EMAIL = savedEmail;
-             mealsItem.setStrCreativeCommonsConfirmed(savedEmail);
-             Log.e("TAG", "email: "+savedEmail);
+            String savedEmail = SharedPreferencesManager.getUserEmail(requireContext());
+            mealsItem.setStrCreativeCommonsConfirmed(savedEmail);
+            Log.e("TAG", "email: " + savedEmail);
             mealDetailsPresenter.addMealToWeeklyPlan(mealsItem);
             mealDetailsPresenter.addWeeklyPlayMealToFireStore(mealsItem);
-            //Toast.makeText(getContext(), "Selected day: " + selectedDay, Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         };
         sundayButton.setOnClickListener(dayClickListener);
@@ -199,40 +180,49 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView{
 
     @Override
     public void onInsertFavSuccess() {
-        AlertMessage.showToastMessage("Meal added to favorite",this.getContext());
+        AlertMessage.showToastMessage("Meal added to favorite", this.getContext());
     }
 
     @Override
     public void onInsertFavError(String error) {
-        AlertMessage.showToastMessage(error,this.getContext());
+        AlertMessage.showToastMessage(error, this.getContext());
     }
 
     @Override
     public void onPlanMealSuccess() {
-        AlertMessage.showToastMessage("Saved to meal plan",requireContext());
+        AlertMessage.showToastMessage("Saved to meal plan", requireContext());
     }
 
     @Override
     public void onPlanMealFail(String error) {
         showFailMessage(error);
-       // AlertMessage.showToastMessage(error,this.getContext());
+        // AlertMessage.showToastMessage(error,this.getContext());
     }
 
     @Override
     public void onSuccessDeleteFromFav() {
-        AlertMessage.showToastMessage("Meal deleted from favorite",this.getContext());
+        AlertMessage.showToastMessage("Meal deleted from favorite", this.getContext());
     }
 
     @Override
     public void onFailDeleteFromFav(String error) {
         showFailMessage(error);
-        //AlertMessage.showToastMessage(error,this.getContext());
     }
 
-    void showFailMessage(String error){
-        AlertMessage.showToastMessage(error,this.getContext());
+    @Override
+    public void onAddToFavSuccessFB() {
+        AlertMessage.showToastMessage("Meal added to firebase", this.getContext());
+
     }
 
+    @Override
+    public void onAddToFavFailFB(String error) {
+        showFailMessage(error);
+    }
+
+    void showFailMessage(String error) {
+        AlertMessage.showToastMessage(error, this.getContext());
+    }
 
 
     private void updateHeartIconVisibility() {

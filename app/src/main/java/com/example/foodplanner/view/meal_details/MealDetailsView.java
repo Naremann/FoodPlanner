@@ -5,6 +5,10 @@ public interface MealDetailsView {
     void onInsertFavError(String error);
     void onPlanMealSuccess();
     void onPlanMealFail(String error);
-    public void onSuccessDeleteFromFav();
-    public void onFailDeleteFromFav(String error);
+     void onSuccessDeleteFromFav();
+     void onFailDeleteFromFav(String error);
+
+
+    void onAddToFavSuccessFB();
+    void onAddToFavFailFB(String error);
 }

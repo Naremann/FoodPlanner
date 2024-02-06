@@ -62,7 +62,7 @@ public class CalenderFragment extends Fragment implements CalenderView{
     private void initDependencies() {
 
         calenderPresenter=new CalenderPresenter.CalenderPresenterImp(this,
-                new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()),new MealRemoteDataSource.MealRemoteDataSourceImp()));
+                new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()),new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())));
         calenderPresenter.getPlannedMealsByDate("Mon");
         calenderPresenter.getPlannedMealsByDate("Sat");
         calenderPresenter.getPlannedMealsByDate("Tue");

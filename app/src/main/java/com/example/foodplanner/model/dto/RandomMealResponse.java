@@ -1,6 +1,7 @@
 package com.example.foodplanner.model.dto;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -27,6 +28,16 @@ public class RandomMealResponse{
 
 		@SerializedName("strIngredient10")
 		private String strIngredient10;
+		@ColumnInfo(name = "is_favorite")
+		private boolean isFavorite;
+
+		public boolean isFavorite() {
+			return isFavorite;
+		}
+
+		public void setFavorite(boolean favorite) {
+			isFavorite = favorite;
+		}
 
 		public void setStrImageSource(String strImageSource) {
 			this.strImageSource = strImageSource;

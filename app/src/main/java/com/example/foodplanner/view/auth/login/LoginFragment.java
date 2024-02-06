@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.foodplanner.Constants;
+import com.example.foodplanner.db.SharedPreferencesManager;
 import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.presenter.login.LoginPresenter;
@@ -95,10 +96,11 @@ public class LoginFragment extends Fragment implements LoginView {
     private void loginWithFirebaseAuth() {
         loginPresenter.signInWithFirebaseAuth(email.getText().toString(), password.getText().toString());
         String emailText = email.getText().toString();
-        SharedPreferences sharedPreferences = this.requireContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        SharedPreferencesManager.saveUserEmail(requireContext(),emailText);
+        /*SharedPreferences sharedPreferences = this.requireContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("email", emailText);
-        editor.apply();
+        editor.apply();*/
 
     }
 

@@ -2,22 +2,23 @@ package com.example.foodplanner.model.repo;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSource;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.List;
 
-import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MealRepoImp implements MealRepo{
     RandomMealRemoteDataSource randomMealRemoteDataSource;
@@ -66,40 +67,70 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
-    public void addMealToWeeklyPlay(RandomMealResponse.MealsItem mealsItem, String email, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
-        mealRemoteDataSource.addMealToFav(mealsItem,onSuccessListener,onFailureListener);
-
+    public void addMealToFav(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        mealRemoteDataSource.addMealToPlan(mealsItem,onSuccessListener,onFailureListener);
     }
 
     @Override
+    public void addMealToWeeklyPlay(RandomMealResponse.MealsItem mealsItem, String email, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        mealRemoteDataSource.addMealToPlan(mealsItem,onSuccessListener,onFailureListener);
+    }
+
+
+    @Override
     public Observable<List<RandomMealResponse.MealsItem>> getWeeklyPlannedMealsObservable(String date) {
-
-
-        Log.d("TAG", "Fetching data from Firestore");
         return mealRemoteDataSource.getWeeklyPlannedMealsObservable(date)
                 .doOnSubscribe(disposable -> Log.d("TAG", "Subscribed to Firestore Observable"))
                 .doOnNext(meals -> Log.d("TAG", "Received data from Firestore: " + meals.size() + " items"))
                 .doOnError(error -> Log.e("TAG", "Error fetching data from Firestore", error))
                 .switchIfEmpty(Observable.defer(() -> {
-                    Log.d("TAG", "Firestore Observable is empty, fetching data from Room");
                     List<RandomMealResponse.MealsItem> localMeals = mealLocalDataSource.getPlannedMealByDate(date).blockingFirst();
                     if (localMeals.isEmpty()) {
-                        return Observable.empty(); // Return empty Observable if local storage is empty
+                        return Observable.empty();
                     } else {
-                        return Observable.just(localMeals);
+                        return Observable.fromArray(localMeals);
                     }
                 }));
-        /*Log.d("TAG", "Fetching data from Firestore");
-        return mealRemoteDataSource.getWeeklyPlannedMealsObservable(date)
-                .doOnSubscribe(disposable -> Log.d("TAG", "Subscribed to Firestore Observable"))
-                .doOnNext(meals -> Log.d("TAG", "Received data from Firestore: " + meals.size() + " items"))
-                .doOnError(error -> Log.e("TAG", "Error fetching data from Firestore", error))
-                .switchIfEmpty(Observable.fromCallable(() -> {
-                    Log.d("TAG", "Firestore Observable is empty, fetching data from Room");
-                    return mealLocalDataSource.getPlannedMealByDate(date).blockingFirst();
-                }));*/
     }
 
+    @Override
+    public Flowable<List<RandomMealResponse.MealsItem>> getAllFavMeals() {
+        return mealLocalDataSource.getFavMeals()
+                .flatMap(favMeals -> {
+                    if (favMeals.isEmpty()) {
+                        return fetchAndSaveFavMealsFromRemote();
+                    } else {
+                        return Flowable.just(favMeals);
+                    }
+                });
+    }
+
+    @Override
+    public Completable deleteFromRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+        Completable deleteFromRemote=Completable.create(emitter -> {
+            mealRemoteDataSource.deleteFavoriteMealFromFireStore(mealsItem, unused -> {
+                emitter.onComplete();
+            }, e -> {
+                emitter.onError(new IllegalStateException(e.getLocalizedMessage()));
+            });
+        });
+        Completable deleteFromLocal=mealLocalDataSource.deleteFavoriteProduct(mealsItem);
+        return Completable.mergeArray(deleteFromRemote,deleteFromLocal);
+    }
+
+    private Flowable<List<RandomMealResponse.MealsItem>> fetchAndSaveFavMealsFromRemote() {
+        return mealRemoteDataSource.getFavMealsFromFirestore()
+                .flatMapCompletable(mealsItems -> {
+                    Completable insertCompletable = Completable.complete();
+                    for (RandomMealResponse.MealsItem mealItem : mealsItems) {
+                        insertCompletable = insertCompletable
+                                .andThen(mealLocalDataSource.insertProductToFavorite(mealItem));
+                    }
+                    return insertCompletable.andThen(Completable.fromAction(() -> {
+                    }));
+                })
+                .andThen(mealLocalDataSource.getFavMeals());
+    }
 
 
 }

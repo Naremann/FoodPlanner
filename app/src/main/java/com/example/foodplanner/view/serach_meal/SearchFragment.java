@@ -69,7 +69,7 @@ public class SearchFragment extends Fragment implements HomeView {
         homePresenter=new HomePresenterImp(this,
                 new MealRepoImp(
                         new RandomMealRemoteDataSourceImp(),
-                        new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()),new MealRemoteDataSource.MealRemoteDataSourceImp()),
+                        new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()),new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())),
                 new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()));
         homePresenter.getCategories();
         intiViews(view);
