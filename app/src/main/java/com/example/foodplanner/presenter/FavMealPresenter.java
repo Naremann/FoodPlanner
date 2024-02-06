@@ -26,13 +26,7 @@ public interface FavMealPresenter {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(favMeals->favoriteView.onGetAllFavoriteFireStoreMeals((List<RandomMealResponse.MealsItem>)  favMeals),
                             error-> favoriteView.onGetAllFavoriteMealsError(error.getLocalizedMessage()));
-            /*mealRepo.getFavMeals()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            favMeals -> favoriteView.onGetAllFavoriteMeals((List<RandomMealResponse.MealsItem>) favMeals),
-                            error -> favoriteView.onGetAllFavoriteMealsError(error.toString())
-                    );*/
+
         }
 
         @Override
@@ -44,15 +38,6 @@ public interface FavMealPresenter {
                             () -> favoriteView.onSuccessDeleteFromFav(),
                             error -> favoriteView.onFailDeleteFromFav(error.getLocalizedMessage())
                     );
-
-            /*mealRepo.deleteMealFromFav(mealItem)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            () -> favoriteView.onSuccessDeleteFromFav(),
-                            error -> favoriteView.onFailDeleteFromFav(error.getLocalizedMessage())
-                    );*/
-
         }
     }
 }

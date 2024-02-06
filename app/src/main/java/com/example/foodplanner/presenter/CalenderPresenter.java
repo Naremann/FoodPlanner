@@ -1,27 +1,14 @@
 package com.example.foodplanner.presenter;
 
-import androidx.annotation.NonNull;
-
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepo;
 import com.example.foodplanner.view.calender.CalenderView;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.util.List;
-import java.util.Map;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public interface CalenderPresenter {
     void getPlannedMealsByDate(String date);
-    public void getWeeklyPlannedMealsFirestore(String date);
+    //public void getWeeklyPlannedMealsFirestore(String date);
     void addMealToFavorite(RandomMealResponse.MealsItem mealsItem);
 
 
@@ -37,13 +24,18 @@ public interface CalenderPresenter {
 
         @Override
         public void getPlannedMealsByDate(String date) {
-            mealRepo.getPlannedMealsByDate(date).subscribeOn(Schedulers.io())
+            mealRepo.getAllPlannedMeals(date)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(mealsItems->calenderView.onGetAllPlannedMeals(mealsItems,date),
+                            error->calenderView.onGetAllPlannedMealsError(error.getLocalizedMessage()));
+            /*mealRepo.getPlannedMealsByDate(date).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(meals -> calenderView.onGetAllPlannedMeals((List<RandomMealResponse.MealsItem>) meals, date),
-                            error -> calenderView.onGetAllPlannedMealsError(error.toString()));
+                            error -> calenderView.onGetAllPlannedMealsError(error.toString()));*/
         }
 
-        @Override
+       /* @Override
         public void getWeeklyPlannedMealsFirestore(String date) {
             Disposable disposable = mealRepo.getWeeklyPlannedMealsObservable(date)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -51,13 +43,17 @@ public interface CalenderPresenter {
                             meals -> calenderView.showWeeklyPlannedMeals(meals,date),
                             throwable -> calenderView.showPlannedMealsErrorFireStore(throwable.getMessage())
                     );
-        }
+        }*/
 
         @Override
         public void addMealToFavorite(RandomMealResponse.MealsItem mealsItem) {
-            mealRepo.addMealToFavorite(mealsItem).
+            mealRepo.insertMealToFavRemoteAndLocal(mealsItem)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(()->calenderView.onInsertFavSuccess(),error->calenderView.onInsertFavError(error.getLocalizedMessage()));
+          /*  mealRepo.addMealToFavorite(mealsItem).
                     subscribe(()->calenderView.onInsertFavSuccess(),
-                            error->calenderView.onInsertFavError(error.getLocalizedMessage()));
+                            error->calenderView.onInsertFavError(error.getLocalizedMessage()));*/
         }
 
     }

@@ -2,10 +2,7 @@ package com.example.foodplanner.view.meal_details;
 
 import static com.example.foodplanner.model.dto.Ingredient.getIngredients;
 
-import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,13 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.foodplanner.Constants;
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.YouTubeVideo;
@@ -38,12 +32,9 @@ import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.MealDetailsPresenter;
-import com.example.foodplanner.presenter.MealPresenter;
 import com.example.foodplanner.view.AlertMessage;
-import com.example.foodplanner.view.meal_by_category.CategoryMealFragmentArgs;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class MealDetailsFragment extends Fragment implements MealDetailsView {
@@ -78,23 +69,19 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
         if (getArguments() != null) {
             mealsItem = MealDetailsFragmentArgs.fromBundle(getArguments()).getMeal();
             isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext(), mealsItem.getIdMeal());
-            updateHeartIconVisibility();
+            updateHeartIconVisibility(mealsItem);
             Log.e("TAG", "onViewCreated: " + mealsItem.getStrArea());
             emptyHeartImg.setOnClickListener(v -> {
+                mealDetailsPresenter.addMealToFavorite(mealsItem);
                 mealsItem.setStrCreativeCommonsConfirmed(SharedPreferencesManager.getUserEmail(requireContext()));
                 mealsItem.setFavorite(true);
-                mealDetailsPresenter.addMealToFavFireStore(mealsItem);
-                mealDetailsPresenter.addMealToFavorite(mealsItem);
-                fillHeartImg.setVisibility(View.VISIBLE);
-                emptyHeartImg.setVisibility(View.INVISIBLE);
+                onInsertFavSuccess();
                 SharedPreferencesManager.saveFavoriteStatus(getContext(), true, mealsItem.getIdMeal());
 
             });
             fillHeartImg.setOnClickListener(v -> {
-                mealDetailsPresenter.deleteFavMeals(mealsItem);
-                fillHeartImg.setVisibility(View.INVISIBLE);
-                emptyHeartImg.setVisibility(View.VISIBLE);
-                SharedPreferencesManager.saveFavoriteStatus(getContext(), false, mealsItem.getIdMeal());
+                deleteMealFromFav(mealsItem);
+                
             });
         }
         ingredients = new ArrayList<>();
@@ -115,6 +102,12 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
                 MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()), new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())), this);
 
 
+    }
+    public void deleteMealFromFav(RandomMealResponse.MealsItem mealsItem){
+        mealDetailsPresenter.deleteFavMeals(mealsItem);
+        fillHeartImg.setVisibility(View.INVISIBLE);
+        emptyHeartImg.setVisibility(View.VISIBLE);
+        SharedPreferencesManager.saveFavoriteStatus(getContext(), false, mealsItem.getIdMeal());
     }
 
 
@@ -151,21 +144,16 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
         final Dialog dialog = new Dialog(this.requireContext());
         dialog.setContentView(R.layout.dialog_day_selector);
         dialog.setTitle("Select Day");
-        sundayButton = dialog.findViewById(R.id.sundayButton);
-        mondayButton = dialog.findViewById(R.id.mondayButton);
-        tuesdayButton = dialog.findViewById(R.id.tuesdayButton);
-        wednesdayButton = dialog.findViewById(R.id.wednesdayButton);
-        thursdayButton = dialog.findViewById(R.id.thursdayButton);
-        fridayButton = dialog.findViewById(R.id.fridayButton);
-        saturdayButton = dialog.findViewById(R.id.saturdayButton);
+        initDialogButtons(dialog);
         View.OnClickListener dayClickListener = v -> {
             String selectedDay = ((Button) v).getText().toString();
             mealsItem.setDateModified(selectedDay);
             String savedEmail = SharedPreferencesManager.getUserEmail(requireContext());
             mealsItem.setStrCreativeCommonsConfirmed(savedEmail);
             Log.e("TAG", "email: " + savedEmail);
+            //mealDetailsPresenter.i
             mealDetailsPresenter.addMealToWeeklyPlan(mealsItem);
-            mealDetailsPresenter.addWeeklyPlayMealToFireStore(mealsItem);
+           // mealDetailsPresenter.addWeeklyPlayMealToFireStore(mealsItem);
             dialog.dismiss();
         };
         sundayButton.setOnClickListener(dayClickListener);
@@ -178,25 +166,39 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
         dialog.show();
     }
 
-    @Override
-    public void onInsertFavSuccess() {
-        AlertMessage.showToastMessage("Meal added to favorite", this.getContext());
+    private void initDialogButtons(Dialog dialog) {
+        sundayButton = dialog.findViewById(R.id.sundayButton);
+        mondayButton = dialog.findViewById(R.id.mondayButton);
+        tuesdayButton = dialog.findViewById(R.id.tuesdayButton);
+        wednesdayButton = dialog.findViewById(R.id.wednesdayButton);
+        thursdayButton = dialog.findViewById(R.id.thursdayButton);
+        fridayButton = dialog.findViewById(R.id.fridayButton);
+        saturdayButton = dialog.findViewById(R.id.saturdayButton);
     }
 
     @Override
+    public void onInsertFavSuccess() {
+        fillHeartImg.setVisibility(View.VISIBLE);
+        emptyHeartImg.setVisibility(View.INVISIBLE);
+        if (isAdded()) {
+            AlertMessage.showToastMessage("Meal added to favorite", requireContext());
+        }    }
+
+    @Override
     public void onInsertFavError(String error) {
-        AlertMessage.showToastMessage(error, this.getContext());
+        AlertMessage.showToastMessage(error, requireContext());
     }
 
     @Override
     public void onPlanMealSuccess() {
-        AlertMessage.showToastMessage("Saved to meal plan", requireContext());
+        if(isAdded()){
+            AlertMessage.showToastMessage("Saved to meal plan", requireContext());
+        }
     }
 
     @Override
     public void onPlanMealFail(String error) {
         showFailMessage(error);
-        // AlertMessage.showToastMessage(error,this.getContext());
     }
 
     @Override
@@ -208,30 +210,26 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
     public void onFailDeleteFromFav(String error) {
         showFailMessage(error);
     }
-
-    @Override
-    public void onAddToFavSuccessFB() {
-        AlertMessage.showToastMessage("Meal added to firebase", this.getContext());
-
-    }
-
-    @Override
-    public void onAddToFavFailFB(String error) {
-        showFailMessage(error);
-    }
-
     void showFailMessage(String error) {
         AlertMessage.showToastMessage(error, this.getContext());
     }
 
 
-    private void updateHeartIconVisibility() {
+    private void updateHeartIconVisibility(RandomMealResponse.MealsItem mealsItem) {
         if (isFavorite) {
             fillHeartImg.setVisibility(View.VISIBLE);
             emptyHeartImg.setVisibility(View.INVISIBLE);
         } else {
-            fillHeartImg.setVisibility(View.INVISIBLE);
-            emptyHeartImg.setVisibility(View.VISIBLE);
+            if(mealsItem.isFavorite()){
+                fillHeartImg.setVisibility(View.VISIBLE);
+                emptyHeartImg.setVisibility(View.INVISIBLE);
+            }
+            else {
+                fillHeartImg.setVisibility(View.INVISIBLE);
+                emptyHeartImg.setVisibility(View.VISIBLE);
+            }
+            //fillHeartImg.setVisibility(View.INVISIBLE);
+            //emptyHeartImg.setVisibility(View.VISIBLE);
         }
     }
 }
