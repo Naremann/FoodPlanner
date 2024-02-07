@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.CategoryResponse;
-import com.example.foodplanner.model.dto.MealsItem;
+import com.example.foodplanner.model.dto.RandomMealResponse.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.presenter.MealPresenter;
@@ -75,7 +75,7 @@ public class CategoryMealFragment extends Fragment implements MealByCategoryView
     }
 
     @Override
-    public void showMeal(List<MealsItem> mealsItems) {
+    public void showMeal(List<RandomMealResponse.MealsItem> mealsItems) {
         mealAdapter.changeData(mealsItems);
     }
 

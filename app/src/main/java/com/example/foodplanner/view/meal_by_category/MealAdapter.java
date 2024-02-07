@@ -5,20 +5,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.example.foodplanner.GlideImage;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.foodplanner.R;
-import com.example.foodplanner.model.dto.MealsItem;
+import com.example.foodplanner.model.dto.RandomMealResponse;
 
 import java.util.List;
 
 public class MealAdapter extends RecyclerView.Adapter<MealAdapter.ViewHolder> {
-   List<MealsItem> mealsItems;
+   List<RandomMealResponse.MealsItem> mealsItems;
   public OnItemClickListener onItemClickListener;
 
-    public MealAdapter(List<MealsItem> mealsItems) {
+    public MealAdapter(List<RandomMealResponse.MealsItem> mealsItems) {
         this.mealsItems = mealsItems;
     }
 
@@ -32,7 +31,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        MealsItem mealsItem=mealsItems.get(position);
+        RandomMealResponse.MealsItem mealsItem=mealsItems.get(position);
         holder.mealNameTv.setText(mealsItem.getStrMeal());
         GlideImage.
                 downloadImageToImageView(holder.mealImg.getContext(),mealsItem.getStrMealThumb(),holder.mealImg);
@@ -49,8 +48,12 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.ViewHolder> {
     public int getItemCount() {
         return mealsItems.size();
     }
-    void changeData(List<MealsItem> mealsItems){
+    public void changeData(List<RandomMealResponse.MealsItem> mealsItems){
         this.mealsItems=mealsItems;
+        notifyDataSetChanged();
+    }
+    public void clearData() {
+        mealsItems.clear();
         notifyDataSetChanged();
     }
 
@@ -68,7 +71,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.ViewHolder> {
             mealNameTv=view.findViewById(R.id.meal_title_tv);
         }
     }
-    interface OnItemClickListener{
-        void onItemClick(MealsItem mealsItem);
+    public interface OnItemClickListener{
+        void onItemClick(RandomMealResponse.MealsItem mealsItem);
     }
 }

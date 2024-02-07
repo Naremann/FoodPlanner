@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".view.serach_meal.SearchFragment">
+    tools:context=".view.serach_meal.SearchMealFragment">
 
     <SearchView
         android:id="@+id/search_view"
@@ -14,14 +14,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_meals"
+        android:id="@+id/recycler_view_meal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/search_view"
         android:layout_marginTop="6dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="3"
+        android:orientation="vertical"
+        />
+    <ProgressBar
+        android:id="@+id/category_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/recyclerview_meals"
+        app:layout_constraintBottom_toBottomOf="@id/recyclerview_meals"
+        app:layout_constraintStart_toStartOf="@id/recyclerview_meals"
+        app:layout_constraintEnd_toEndOf="@id/recyclerview_meals"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_meals"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/recycler_view_meal"
+        android:layout_marginTop="6dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         android:orientation="horizontal"
-        app:spanCount="2"
+        app:spanCount="3"
         android:padding="8dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.example.foodplanner.model.repo.remote;
 
 import android.content.Context;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface MealRemoteDataSource {
-    @NonNull Observable<Object> getMealByCategory(String category);
+    @NonNull Observable<List<RandomMealResponse.MealsItem>> getMealByCategory(String category);
 
     Observable<Object> getMealById(String mealId);
 
@@ -43,8 +44,7 @@ public interface MealRemoteDataSource {
                                          OnFailureListener onFailureListener);
 
      void deletePlannedMealFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
-
-
+     Observable<List<RandomMealResponse.MealsItem>> searchMeals(String name);
 
 
 
@@ -60,8 +60,22 @@ public interface MealRemoteDataSource {
         }
 
         @Override
-        public @NonNull Observable<Object> getMealByCategory(String category) {
-            return Observable.create(emitter -> webService.getAllMealsByCategory(category).enqueue(new Callback<MealResponse>() {
+        public @NonNull Observable<List<RandomMealResponse.MealsItem>> getMealByCategory(String category) {
+            return webService.getAllMealsByCategory(category)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .map(mealResponse -> {
+                        List<RandomMealResponse.MealsItem> meals = new ArrayList<>();
+                        if (mealResponse != null && mealResponse.getMeals() != null) {
+                            meals.addAll(mealResponse.getMeals());
+                        }
+                        return meals;
+                    });
+            /*return webService.getAllMealsByCategory(category)
+                    .map(MealResponse::getMeals)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());*/
+            /*return Observable.create(emitter -> webService.getAllMealsByCategory(category).enqueue(new Callback<MealResponse>() {
                 @Override
                 public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
@@ -76,7 +90,7 @@ public interface MealRemoteDataSource {
                 public void onFailure(Call<MealResponse> call, Throwable t) {
                     emitter.onError(t);
                 }
-            })).subscribeOn(Schedulers.io());
+            })).subscribeOn(Schedulers.io());*/
         }
 
         @Override
@@ -165,6 +179,14 @@ public interface MealRemoteDataSource {
         @Override
         public void deletePlannedMealFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
             FirebaseUtils.deletePlannedMeal(context,mealsItem.getIdMeal(),onSuccessListener,onFailureListener);
+        }
+
+        @Override
+        public Observable<List<RandomMealResponse.MealsItem>> searchMeals(String name) {
+            return webService.searchMealByName(name)
+                    .map(MealResponse::getMeals)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
         }
 
     }
