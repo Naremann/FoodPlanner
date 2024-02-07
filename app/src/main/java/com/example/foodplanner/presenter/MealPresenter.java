@@ -2,7 +2,6 @@ package com.example.foodplanner.presenter;
 
 import android.util.Log;
 import com.example.foodplanner.api.CategoryMealCallBack;
-import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.view.meal_by_category.MealByCategoryView;
@@ -53,7 +52,7 @@ public interface MealPresenter {
         }
 
         private void handleSuccess(Object o) {
-            meal.showMeal((List<MealsItem>)o);
+            meal.showMeal((List<RandomMealResponse.MealsItem>)o);
         }
 
 
@@ -61,7 +60,7 @@ public interface MealPresenter {
             meal.showMealById((RandomMealResponse.MealsItem)o);
         }
 
-        private void handleSuccess(List<MealsItem> mealsItems) {
+        private void handleSuccess(List<RandomMealResponse.MealsItem> mealsItems) {
             meal.showMeal(mealsItems);
         }
 
@@ -82,7 +81,7 @@ public interface MealPresenter {
         }
 
         @Override
-        public void onSuccessCategoryMeal(List<MealsItem> mealsItems) {
+        public void onSuccessCategoryMeal(List<RandomMealResponse.MealsItem> mealsItems) {
             handleSuccess(mealsItems);
         }
 

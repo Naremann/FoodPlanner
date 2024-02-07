@@ -51,12 +51,15 @@
     </fragment>
     <fragment
         android:id="@+id/searchFragment2"
-        android:name="com.example.foodplanner.view.serach_meal.SearchFragment"
+        android:name="com.example.foodplanner.view.serach_meal.SearchMealFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_searchFragment2_to_categoryMealFragment"
             app:destination="@id/categoryMealFragment" />
+        <action
+            android:id="@+id/action_searchFragment2_to_mealDetailsFragment"
+            app:destination="@id/mealDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/calenderFragment"

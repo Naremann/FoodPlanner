@@ -2,7 +2,7 @@ package com.example.foodplanner.model.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class MealsItem{
+/*public class MealsItem{
 
 	@SerializedName("strMealThumb")
 	private String strMealThumb;
@@ -24,4 +24,4 @@ public class MealsItem{
 	public String getStrMeal(){
 		return strMeal;
 	}
-}
+}*/

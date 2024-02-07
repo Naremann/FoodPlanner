@@ -7,6 +7,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
+import android.view.Menu;
 
 import com.example.foodplanner.R;
 import com.example.foodplanner.view.meal_details.MealDetailsFragment;
@@ -29,21 +30,6 @@ public class HomeActivity extends AppCompatActivity{
     }
 
     private void initViews() {
-       /* bottomNavigationView=findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            switch (itemId) {
-                case (R.id.menu_home_fragment):
-                    navController.navigate(R.id.homeFragment);
-                    return true;
-                case R.id.menu_favorite_meal_fragment:
-                    navController.navigate(R.id.favoriteMealsFragment);
-                    return true;
-                // Add more cases for other menu items
-                default:
-                    return false;
-            }
-        });*/
     }
 
     @Override
