@@ -27,7 +27,7 @@ public interface MealDao {
     @Delete
     Completable deleteMealFromFavorite(RandomMealResponse.MealsItem mealsItem);
 
-    @Query("select * from mealItem where dateModified = :date")
+    @Query("select * from mealItem where dateModified = :date AND is_planned=1")
     Flowable<List<MealsItem>> getPlannedMealsByDate(String date);
 
 

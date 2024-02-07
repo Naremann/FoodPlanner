@@ -1,5 +1,6 @@
 package com.example.foodplanner.view.calender;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,7 +21,6 @@ import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.CalenderPresenter;
-import com.example.foodplanner.presenter.MealDetailsPresenter;
 import com.example.foodplanner.view.AlertMessage;
 
 import java.util.ArrayList;
@@ -28,14 +28,19 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class CalenderFragment extends Fragment implements CalenderView{
+public class CalenderFragment extends Fragment implements CalenderView {
     CalenderAdapter calenderAdapter;
-    RecyclerView recyclerViewSat,recyclerViewSun,recyclerViewMon,recyclerViewTues,recyclerViewWed,recyclerViewThurs,recyclerViewFri;
-    Button satBtn,sunBtn,monBtn,tuesBtn,wedBun,thursBtn,friBtn;
+    RecyclerView recyclerViewSat, recyclerViewSun, recyclerViewMon, recyclerViewTues, recyclerViewWed, recyclerViewThurs, recyclerViewFri;
+    Button satBtn, sunBtn, monBtn, tuesBtn, wedBun, thursBtn, friBtn;
     String date;
     CalenderPresenter calenderPresenter;
-    MealDetailsPresenter mealDetailsPresenter;
-    RandomMealResponse.MealsItem mealsItem;
+    CalenderAdapter adapterSat;
+    CalenderAdapter adapterSun;
+    CalenderAdapter adapterMon;
+    CalenderAdapter adapterTue;
+    CalenderAdapter adapterWed;
+    CalenderAdapter adapterThu;
+    CalenderAdapter adapterFri;
 
 
     public CalenderFragment() {
@@ -61,8 +66,8 @@ public class CalenderFragment extends Fragment implements CalenderView{
 
     private void initDependencies() {
 
-        calenderPresenter=new CalenderPresenter.CalenderPresenterImp(this,
-                new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()),new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())));
+        calenderPresenter = new CalenderPresenter.CalenderPresenterImp(this,
+                new MealRepoImp(new RandomMealRemoteDataSourceImp(), new MealLocalDatasource.MealLocalDataSourceImp(this.requireContext()), new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())));
         calenderPresenter.getPlannedMealsByDate("Mon");
         calenderPresenter.getPlannedMealsByDate("Sat");
         calenderPresenter.getPlannedMealsByDate("Tue");
@@ -70,29 +75,55 @@ public class CalenderFragment extends Fragment implements CalenderView{
         calenderPresenter.getPlannedMealsByDate("Wed");
         calenderPresenter.getPlannedMealsByDate("Thu");
         calenderPresenter.getPlannedMealsByDate("Fri");
-      /*  calenderPresenter.getWeeklyPlannedMealsFirestore("Mon");
-        calenderPresenter.getWeeklyPlannedMealsFirestore("Sat");
-        calenderPresenter.getWeeklyPlannedMealsFirestore("Tue");
-        calenderPresenter.getWeeklyPlannedMealsFirestore("Sun");
-        calenderPresenter.getWeeklyPlannedMealsFirestore("Wed");
-        calenderPresenter.getWeeklyPlannedMealsFirestore("Thu");
-        calenderPresenter.getWeeklyPlannedMealsFirestore("Fri");*/
 
+    }
 
+    private void initViews(View view) {
+        calenderAdapter = new CalenderAdapter(new ArrayList<>());
+        recyclerViewSat = view.findViewById(R.id.recycler_view);
+        recyclerViewSun = view.findViewById(R.id.recycler_view_sun);
+        recyclerViewMon = view.findViewById(R.id.recycler_view_mon);
+        recyclerViewTues = view.findViewById(R.id.recycler_view_tue);
+        recyclerViewWed = view.findViewById(R.id.recycler_view_wed);
+        recyclerViewThurs = view.findViewById(R.id.recycler_view_thurs);
+        recyclerViewFri = view.findViewById(R.id.recycler_view_fri);
+
+        adapterSat = new CalenderAdapter(new ArrayList<>());
+        adapterSun = new CalenderAdapter(new ArrayList<>());
+        adapterMon = new CalenderAdapter(new ArrayList<>());
+        adapterTue = new CalenderAdapter(new ArrayList<>());
+        adapterWed = new CalenderAdapter(new ArrayList<>());
+        adapterThu = new CalenderAdapter(new ArrayList<>());
+        adapterFri = new CalenderAdapter(new ArrayList<>());
+
+        adapterSat.onCancelClickListener = createOnCancelClickListener();
+        adapterSun.onCancelClickListener = createOnCancelClickListener();
+        adapterMon.onCancelClickListener = createOnCancelClickListener();
+        adapterTue.onCancelClickListener = createOnCancelClickListener();
+        adapterWed.onCancelClickListener = createOnCancelClickListener();
+        adapterThu.onCancelClickListener = createOnCancelClickListener();
+        adapterFri.onCancelClickListener = createOnCancelClickListener();
+
+        recyclerViewSat.setAdapter(adapterSat);
+        recyclerViewSun.setAdapter(adapterSun);
+        recyclerViewMon.setAdapter(adapterMon);
+        recyclerViewTues.setAdapter(adapterTue);
+        recyclerViewWed.setAdapter(adapterWed);
+        recyclerViewThurs.setAdapter(adapterThu);
+        recyclerViewFri.setAdapter(adapterFri);
 
 
 
     }
 
-    private void initViews(View view) {
-        calenderAdapter=new CalenderAdapter(new ArrayList<>());
-        recyclerViewSat=view.findViewById(R.id.recycler_view);
-        recyclerViewSun=view.findViewById(R.id.recycler_view_sun);
-        recyclerViewMon=view.findViewById(R.id.recycler_view_mon);
-        recyclerViewTues=view.findViewById(R.id.recycler_view_tue);
-        recyclerViewWed=view.findViewById(R.id.recycler_view_wed);
-        recyclerViewThurs=view.findViewById(R.id.recycler_view_thurs);
-        recyclerViewFri=view.findViewById(R.id.recycler_view_fri);
+    private CalenderAdapter.OnCancelClickListener createOnCancelClickListener() {
+        return mealsItem -> {
+            AlertMessage.showCustomAlertDialog(requireContext(),
+                    "Are you sure you want to delete the meal from weekly plan?"
+                    , "Yes", (dialog, which) -> {
+                        calenderPresenter.deleteMealFromWeeklyPlan(mealsItem);
+                    });
+        };
     }
 
     @Override
@@ -108,49 +139,29 @@ public class CalenderFragment extends Fragment implements CalenderView{
 
         switch (date) {
             case "Sat":
-                recyclerViewSat.setAdapter(new CalenderAdapter(filteredMeals));
+                adapterSat.changeData(filteredMeals);
                 break;
             case "Sun":
-                recyclerViewSun.setAdapter(new CalenderAdapter(filteredMeals));
+                adapterSun.changeData(filteredMeals);
                 break;
             case "Mon":
-                recyclerViewMon.setAdapter(new CalenderAdapter(filteredMeals));
+                adapterMon.changeData(filteredMeals);
                 break;
             case "Tue":
-                recyclerViewTues.setAdapter(new CalenderAdapter(filteredMeals));
+                adapterTue.changeData(filteredMeals);
                 break;
             case "Wed":
-                recyclerViewWed.setAdapter(new CalenderAdapter(filteredMeals));
+                adapterWed.changeData(filteredMeals);
                 break;
             case "Thu":
-                recyclerViewThurs.setAdapter(new CalenderAdapter(filteredMeals));
+                adapterThu.changeData(filteredMeals);
                 break;
             case "Fri":
-                recyclerViewFri.setAdapter(new CalenderAdapter(filteredMeals));
+                adapterFri.changeData(filteredMeals);
                 break;
-        }
     }
 
-
-    @Override
-    public void onGetAllPlannedMealsError(String errorMessage) {
-        showErrorMessage(errorMessage);
-    }
-
-    /*@Override
-    public void showWeeklyPlannedMeals(List<RandomMealResponse.MealsItem> mealsItems,String date) {
-        List<RandomMealResponse.MealsItem> filteredMeals = new ArrayList<>();
-
-        for (RandomMealResponse.MealsItem mealsItem : mealsItems) {
-            if (mealsItem.getDateModified() != null && mealsItem.getDateModified().equalsIgnoreCase(date)) {
-                filteredMeals.add(mealsItem);
-                if(mealsItem != null){
-                    calenderPresenter.addMealToFavorite(mealsItem);
-                }
-                Log.e("TAG", "showWeeklyPlannedMeals: "+mealsItem.getIdMeal());
-            }
-        }
-        switch (date) {
+        /*switch (date) {
             case "Sat":
                 recyclerViewSat.setAdapter(new CalenderAdapter(filteredMeals));
                 break;
@@ -172,30 +183,44 @@ public class CalenderFragment extends Fragment implements CalenderView{
             case "Fri":
                 recyclerViewFri.setAdapter(new CalenderAdapter(filteredMeals));
                 break;
-        }
-    }*/
+        }*/
 
-    /*@Override
-    public void showPlannedMealsErrorFireStore(String error) {
-        showErrorMsg(error);
-    }*/
+
+    }
+
+
+    @Override
+    public void onGetAllPlannedMealsError(String errorMessage) {
+        showErrorMessage(errorMessage);
+    }
 
     @Override
     public void onInsertFavSuccess() {
-
+        showMsg("Meal added to favorite");
     }
 
     @Override
     public void onInsertFavError(String localizedMessage) {
-        showErrorMsg(localizedMessage);
+        showMsg(localizedMessage);
 
+    }
+
+
+    @Override
+    public void onDeletePlannedMealSuccess() {
+        showMsg("Meal deleted from weekly plan");
+    }
+
+    @Override
+    public void onDeletePlannedMealError(String localizedMessage) {
+        showMsg(localizedMessage);
     }
 
     private void showErrorMessage(String error){
-        showErrorMsg(error);
+        showMsg(error);
     }
 
-    private void showErrorMsg(String error){
-        AlertMessage.showToastMessage(error,getContext());
+    private void showMsg(String message){
+        AlertMessage.showToastMessage(message,getContext());
     }
 }

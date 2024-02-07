@@ -14,5 +14,13 @@
         android:src="@drawable/calendar_orange_24dp"
         android:scaleType="fitXY"
         />
+    <ImageView
+        android:id="@+id/cancel_img"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        app:layout_constraintTop_toTopOf="@id/meal_img"
+        app:layout_constraintEnd_toEndOf="@id/meal_img"
+        android:src="@drawable/cancel"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

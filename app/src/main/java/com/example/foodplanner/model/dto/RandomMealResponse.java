@@ -30,6 +30,17 @@ public class RandomMealResponse{
 		@ColumnInfo(name = "is_favorite")
 		private boolean isFavorite;
 
+		@ColumnInfo(name = "is_planned")
+		private boolean isPlanned;
+
+		public boolean isPlanned() {
+			return isPlanned;
+		}
+
+		public void setPlanned(boolean planned) {
+			isPlanned = planned;
+		}
+
 		public boolean isFavorite() {
 			return isFavorite;
 		}

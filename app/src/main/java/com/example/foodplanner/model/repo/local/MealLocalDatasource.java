@@ -42,7 +42,7 @@ public interface MealLocalDatasource {
         }
 
         public Flowable<List<RandomMealResponse.MealsItem>> getFavMeals() {
-            return favProducts;
+            return mealDao.getAllFavMeals();
         }
 
         @Override

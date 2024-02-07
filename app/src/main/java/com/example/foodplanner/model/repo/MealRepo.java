@@ -27,6 +27,7 @@ public interface MealRepo {
 
     Flowable<List<RandomMealResponse.MealsItem>> getAllFavMeals();
     Completable deleteFromRemoteAndLocal(RandomMealResponse.MealsItem mealsItem);
+    Completable deletePlannedMealRemoteAndLocal(RandomMealResponse.MealsItem mealsItem);
     Completable insertMealToFavRemoteAndLocal(RandomMealResponse.MealsItem mealsItem);
     Completable insertMealToWeeklyPlanRemoteAndLocal(RandomMealResponse.MealsItem mealsItem);
 
