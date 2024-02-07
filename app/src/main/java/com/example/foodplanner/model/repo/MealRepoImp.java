@@ -2,6 +2,8 @@ package com.example.foodplanner.model.repo;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
@@ -9,8 +11,6 @@ import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSource;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.List;
 
@@ -128,6 +128,15 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
+    public Completable deletePlannedMealRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+        Completable deleteRemote = Completable.create(emitter -> {
+            mealRemoteDataSource.deletePlannedMealFireStore(mealsItem, unused -> emitter.onComplete(), e -> emitter.onError(new IllegalStateException(e.getLocalizedMessage())));
+        });
+        Completable deleteLocal=mealLocalDataSource.deleteFavoriteProduct(mealsItem);
+        return Completable.mergeArray(deleteRemote,deleteLocal);
+    }
+
+    @Override
     public Completable insertMealToFavRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
         Completable insertRemote=Completable.create(emitter -> {
             mealRemoteDataSource.addMealToFav(mealsItem, unused -> {
@@ -142,6 +151,7 @@ public class MealRepoImp implements MealRepo{
 
     @Override
     public Completable insertMealToWeeklyPlanRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+        mealsItem.setPlanned(true);
        Completable insertRemote=Completable.create(emitter -> {
            mealRemoteDataSource.addMealToPlan(mealsItem, unused -> {
                emitter.onComplete();
@@ -154,7 +164,7 @@ public class MealRepoImp implements MealRepo{
     }
 
     private Flowable<List<RandomMealResponse.MealsItem>> fetchAndSaveFavMealsFromRemote() {
-        return mealRemoteDataSource.getFavMealsFromFirestore()
+        return mealRemoteDataSource.getFavMealsFromFireStore()
                 .flatMapCompletable(mealsItems -> {
                     Completable insertCompletable = Completable.complete();
                     for (RandomMealResponse.MealsItem mealItem : mealsItems) {

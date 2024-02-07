@@ -16,14 +16,9 @@ import com.example.foodplanner.db.FirebaseUtils;
 import com.example.foodplanner.db.SharedPreferencesManager;
 import com.example.foodplanner.model.dto.MealResponse;
 import com.example.foodplanner.model.dto.RandomMealResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -34,7 +29,7 @@ public interface MealRemoteDataSource {
 
     Observable<Object> getMealById(String mealId);
 
-    Observable<List<RandomMealResponse.MealsItem>> getFavMealsFromFirestore();
+    Observable<List<RandomMealResponse.MealsItem>> getFavMealsFromFireStore();
 
     void addMealToPlan(RandomMealResponse.MealsItem mealsItem,
                        OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
@@ -46,6 +41,9 @@ public interface MealRemoteDataSource {
     void deleteFavoriteMealFromFireStore(RandomMealResponse.MealsItem mealsItem,
                                          OnSuccessListener<Void> onSuccessListener,
                                          OnFailureListener onFailureListener);
+
+     void deletePlannedMealFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
+
 
 
 
@@ -63,46 +61,42 @@ public interface MealRemoteDataSource {
 
         @Override
         public @NonNull Observable<Object> getMealByCategory(String category) {
-            return Observable.create(emitter -> {
-                webService.getAllMealsByCategory(category).enqueue(new Callback<MealResponse>() {
-                    @Override
-                    public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            emitter.onNext(response.body().getMeals());
-                            emitter.onComplete();
-                        } else {
-                            emitter.onError(new Throwable("Failed to get meals by category"));
-                        }
+            return Observable.create(emitter -> webService.getAllMealsByCategory(category).enqueue(new Callback<MealResponse>() {
+                @Override
+                public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        emitter.onNext(response.body().getMeals());
+                        emitter.onComplete();
+                    } else {
+                        emitter.onError(new Throwable("Failed to get meals by category"));
                     }
+                }
 
-                    @Override
-                    public void onFailure(Call<MealResponse> call, Throwable t) {
-                        emitter.onError(t);
-                    }
-                });
-            }).subscribeOn(Schedulers.io());
+                @Override
+                public void onFailure(Call<MealResponse> call, Throwable t) {
+                    emitter.onError(t);
+                }
+            })).subscribeOn(Schedulers.io());
         }
 
         @Override
         public @NonNull Observable<Object> getMealById(String mealId) {
-            return Observable.create(emitter -> {
-                webService.getMealById(mealId).enqueue(new Callback<RandomMealResponse>() {
-                    @Override
-                    public void onResponse(Call<RandomMealResponse> call, Response<RandomMealResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            emitter.onNext(response.body().getMeals().get(0));
-                            emitter.onComplete();
-                        } else {
-                            emitter.onError(new Throwable("Failed to get meals"));
-                        }
+            return Observable.create(emitter -> webService.getMealById(mealId).enqueue(new Callback<RandomMealResponse>() {
+                @Override
+                public void onResponse(Call<RandomMealResponse> call, Response<RandomMealResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        emitter.onNext(response.body().getMeals().get(0));
+                        emitter.onComplete();
+                    } else {
+                        emitter.onError(new Throwable("Failed to get meals"));
                     }
+                }
 
-                    @Override
-                    public void onFailure(Call<RandomMealResponse> call, Throwable t) {
-                        emitter.onError(t);
-                    }
-                });
-            }).subscribeOn(Schedulers.io());
+                @Override
+                public void onFailure(Call<RandomMealResponse> call, Throwable t) {
+                    emitter.onError(t);
+                }
+            })).subscribeOn(Schedulers.io());
         }
 
         @Override
@@ -117,113 +111,61 @@ public interface MealRemoteDataSource {
         }
 
         @Override
-        public Observable<List<RandomMealResponse.MealsItem>> getFavMealsFromFirestore() {
-            return Observable.<List<RandomMealResponse.MealsItem>>create(emitter -> {
-                FirebaseUtils.getFavMeals(context, task -> {
-                    if(task.isSuccessful()){
-                        QuerySnapshot  querySnapshot= (QuerySnapshot) task.getResult();
-                        if(querySnapshot!=null){
-                            List<RandomMealResponse.MealsItem> mealsItems=new ArrayList<>();
-                            for (DocumentSnapshot documentSnapshot:querySnapshot.getDocuments()){
-                                RandomMealResponse.MealsItem mealsItem=documentSnapshot.toObject(RandomMealResponse.MealsItem.class);
-                                if(mealsItem!=null){
-                                    mealsItems.add(mealsItem);
-                                }
+        public Observable<List<RandomMealResponse.MealsItem>> getFavMealsFromFireStore() {
+            return Observable.<List<RandomMealResponse.MealsItem>>create(emitter -> FirebaseUtils.getFavMeals(context, task -> {
+                if(task.isSuccessful()){
+                    QuerySnapshot  querySnapshot= (QuerySnapshot) task.getResult();
+                    if(querySnapshot!=null){
+                        List<RandomMealResponse.MealsItem> mealsItems=new ArrayList<>();
+                        for (DocumentSnapshot documentSnapshot:querySnapshot.getDocuments()){
+                            RandomMealResponse.MealsItem mealsItem=documentSnapshot.toObject(RandomMealResponse.MealsItem.class);
+                            if(mealsItem!=null){
+                                mealsItems.add(mealsItem);
                             }
-                            emitter.onNext(mealsItems);
-                            emitter.onComplete();
-                        }else {
-                            emitter.onError(new Exception("QuerySnapshot is null"));
                         }
+                        emitter.onNext(mealsItems);
+                        emitter.onComplete();
+                    }else {
+                        emitter.onError(new Exception("QuerySnapshot is null"));
                     }
-                    else {
-                        emitter.onError(task.getException());
-                    }
-                });
-            }).subscribeOn(Schedulers.io());
+                }
+                else {
+                    emitter.onError(task.getException());
+                }
+            })).subscribeOn(Schedulers.io());
         }
         @Override
         public Observable<List<RandomMealResponse.MealsItem>> getWeeklyPlannedMealsObservable(String date) {
-            return Observable.create((ObservableOnSubscribe<List<RandomMealResponse.MealsItem>>) emitter -> {
-                FirebaseUtils.getWeeklyPlannedMeals(context, date, task -> {
-                    if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-                        if (querySnapshot != null) {
-                            List<RandomMealResponse.MealsItem> mealsItems = new ArrayList<>();
-                            for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
-                                RandomMealResponse.MealsItem mealsItem = documentSnapshot.toObject(RandomMealResponse.MealsItem.class);
-                                if (mealsItem != null) {
-                                    mealsItems.add(mealsItem);
-                                }
+            return Observable.create((ObservableOnSubscribe<List<RandomMealResponse.MealsItem>>) emitter -> FirebaseUtils.getWeeklyPlannedMeals(context, date, task -> {
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = task.getResult();
+                    if (querySnapshot != null) {
+                        List<RandomMealResponse.MealsItem> mealsItems = new ArrayList<>();
+                        for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
+                            RandomMealResponse.MealsItem mealsItem = documentSnapshot.toObject(RandomMealResponse.MealsItem.class);
+                            if (mealsItem != null) {
+                                mealsItems.add(mealsItem);
                             }
-                            emitter.onNext(mealsItems);
-                            emitter.onComplete();
-                        } else {
-                            emitter.onError(new IllegalStateException("No Data"));
                         }
+                        emitter.onNext(mealsItems);
+                        emitter.onComplete();
                     } else {
-                        emitter.onError(task.getException());
+                        emitter.onError(new IllegalStateException("No Data"));
                     }
-                }, e -> emitter.onError(e.fillInStackTrace()));
-            }).subscribeOn(Schedulers.io());
-            /*return Observable.<List<RandomMealResponse.MealsItem>>create(emitter -> {
-                getWeeklyPlannedMeals(
-                        date,
-                        task -> {
-                            if (task.isSuccessful()) {
-                                QuerySnapshot querySnapshot = task.getResult();
-                                if (querySnapshot != null) {
-                                    List<RandomMealResponse.MealsItem> meals = convertQueryDocumentSnapshotToList(querySnapshot);
-                                    emitter.onNext(meals);
-                                    emitter.onComplete();
-                                } else {
-                                    emitter.onError(new IllegalStateException("QuerySnapshot is null"));
-                                }
-                            } else {
-                                emitter.onError(task.getException());
-                            }
-                        },
-                        emitter::onError
-                );
-            }).subscribeOn(Schedulers.io());*/
+                } else {
+                    emitter.onError(task.getException());
+                }
+            }, e -> emitter.onError(e.fillInStackTrace()))).subscribeOn(Schedulers.io());
         }
-
-        public void getWeeklyPlannedMeals(String date, OnCompleteListener<QuerySnapshot> onCompleteListener, OnFailureListener onFailureListener) {
-           /* CollectionReference plannedMealCollection = FirebaseFirestore.getInstance().collection(FirebaseUtils.PLAN_MEAL_COLLECTION_NAME);
-            plannedMealCollection
-                    .whereEqualTo("strCreativeCommonsConfirmed", savedEmail)
-                    .whereEqualTo("dateModified", date)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            onCompleteListener.onComplete(task);
-                        } else {
-                            onFailureListener.onFailure(task.getException());
-                        }
-                    })
-                    .addOnFailureListener(onFailureListener);*/
-        }
-
-
-
         @Override
         public void deleteFavoriteMealFromFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
-            FirebaseUtils.deleteFavMeal(context,mealsItem.getIdMeal(),onSuccessListener,onFailureListener);
+            FirebaseUtils.deleteFavMeal(context, mealsItem.getIdMeal(), onSuccessListener, onFailureListener);
         }
 
-
-        private static List<RandomMealResponse.MealsItem> convertQueryDocumentSnapshotToList(QuerySnapshot queryDocumentSnapshots) {
-            List<RandomMealResponse.MealsItem> mealsList = new ArrayList<>();
-
-            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                RandomMealResponse.MealsItem mealsItem = documentSnapshot.toObject(RandomMealResponse.MealsItem.class);
-                mealsList.add(mealsItem);
-            }
-
-            return mealsList;
+        @Override
+        public void deletePlannedMealFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+            FirebaseUtils.deletePlannedMeal(context,mealsItem.getIdMeal(),onSuccessListener,onFailureListener);
         }
-
-
 
     }
 

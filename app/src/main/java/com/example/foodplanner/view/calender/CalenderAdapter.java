@@ -1,5 +1,6 @@
 package com.example.foodplanner.view.calender;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ public class CalenderAdapter extends RecyclerView.Adapter<CalenderAdapter.ViewHo
 
 
     List<RandomMealResponse.MealsItem> mealsItems;
+    OnCancelClickListener onCancelClickListener;
 
     public CalenderAdapter(List<RandomMealResponse.MealsItem> mealsItems) {
         this.mealsItems = mealsItems;
@@ -37,6 +39,10 @@ public class CalenderAdapter extends RecyclerView.Adapter<CalenderAdapter.ViewHo
         RandomMealResponse.MealsItem mealsItem=mealsItems.get(position);
         GlideImage.downloadImageToImageView(holder.mealImg.getContext(),
                 mealsItem.getStrMealThumb(),holder.mealImg);
+        holder.cancelImg.setOnClickListener(v -> {
+            Log.e("TAG", "onBindViewHolder: "+mealsItem );
+                onCancelClickListener.onItemClick(mealsItem);
+        });
     }
 
     @Override
@@ -49,11 +55,16 @@ public class CalenderAdapter extends RecyclerView.Adapter<CalenderAdapter.ViewHo
         notifyDataSetChanged();
     }
     public class ViewHolder extends RecyclerView.ViewHolder{
-        ImageView mealImg;
+        ImageView mealImg,cancelImg;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             mealImg=itemView.findViewById(R.id.meal_img);
+            cancelImg=itemView.findViewById(R.id.cancel_img);
         }
+    }
+
+    public interface OnCancelClickListener{
+        void onItemClick(RandomMealResponse.MealsItem mealsItem);
     }
 }

@@ -60,8 +60,8 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
         recyclerView=view.findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager=new LinearLayoutManager(this.requireContext(),RecyclerView.VERTICAL,false);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        favMealAdapter.onDeleteTextClickListener= mealsItem -> deleteMealFromFav(mealsItem);
-        favMealAdapter.onItemClickListener= mealsItem -> navigateToMealDetailsFragment(mealsItem);
+        favMealAdapter.onDeleteTextClickListener= this::deleteMealFromFav;
+        favMealAdapter.onItemClickListener= this::navigateToMealDetailsFragment;
         recyclerView.setAdapter(favMealAdapter);
         recyclerView.setLayoutManager(layoutManager);
     }

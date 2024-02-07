@@ -68,6 +68,20 @@ public class FirebaseUtils {
                 }).addOnFailureListener(onFailureListener);
 
     }
+    public static void deletePlannedMeal(Context context,String mealId,
+                                         OnSuccessListener<Void> onSuccessListener,OnFailureListener onFailureListener){
+        String savedEmail=SharedPreferencesManager.getUserEmail(context);
+        getCollectionReference(PLAN_MEAL_COLLECTION_NAME)
+                .whereEqualTo("strCreativeCommonsConfirmed",savedEmail)
+                .whereEqualTo("idMeal",mealId)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot snapshot:queryDocumentSnapshots){
+                        snapshot.getReference().delete()
+                                .addOnSuccessListener(onSuccessListener)
+                                .addOnFailureListener(onFailureListener);
+                    }
+                }).addOnFailureListener(onFailureListener);
+    }
 
     public static void addMealToFav(RandomMealResponse.MealsItem mealsItem,
                                      OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener){

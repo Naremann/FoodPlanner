@@ -8,8 +8,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public interface CalenderPresenter {
     void getPlannedMealsByDate(String date);
-    //public void getWeeklyPlannedMealsFirestore(String date);
     void addMealToFavorite(RandomMealResponse.MealsItem mealsItem);
+    void deleteMealFromWeeklyPlan(RandomMealResponse.MealsItem mealsItem);
+
 
 
 
@@ -29,31 +30,21 @@ public interface CalenderPresenter {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(mealsItems->calenderView.onGetAllPlannedMeals(mealsItems,date),
                             error->calenderView.onGetAllPlannedMealsError(error.getLocalizedMessage()));
-            /*mealRepo.getPlannedMealsByDate(date).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(meals -> calenderView.onGetAllPlannedMeals((List<RandomMealResponse.MealsItem>) meals, date),
-                            error -> calenderView.onGetAllPlannedMealsError(error.toString()));*/
         }
-
-       /* @Override
-        public void getWeeklyPlannedMealsFirestore(String date) {
-            Disposable disposable = mealRepo.getWeeklyPlannedMealsObservable(date)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            meals -> calenderView.showWeeklyPlannedMeals(meals,date),
-                            throwable -> calenderView.showPlannedMealsErrorFireStore(throwable.getMessage())
-                    );
-        }*/
-
         @Override
         public void addMealToFavorite(RandomMealResponse.MealsItem mealsItem) {
             mealRepo.insertMealToFavRemoteAndLocal(mealsItem)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(()->calenderView.onInsertFavSuccess(),error->calenderView.onInsertFavError(error.getLocalizedMessage()));
-          /*  mealRepo.addMealToFavorite(mealsItem).
-                    subscribe(()->calenderView.onInsertFavSuccess(),
-                            error->calenderView.onInsertFavError(error.getLocalizedMessage()));*/
+        }
+
+        @Override
+        public void deleteMealFromWeeklyPlan(RandomMealResponse.MealsItem mealsItem) {
+            mealRepo.deletePlannedMealRemoteAndLocal(mealsItem)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(()->calenderView.onDeletePlannedMealSuccess(),error->calenderView.onDeletePlannedMealError(error.getLocalizedMessage()));
         }
 
     }
