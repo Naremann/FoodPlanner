@@ -25,12 +25,6 @@ public class Ingredient {
         this.ingredientMeasure = ingredientMeasure;
     }
 
-    public Ingredient(String ingredientName, String ingredientMeasure, String thumbnailUrl) {
-        this.ingredientName = ingredientName;
-        this.ingredientMeasure = ingredientMeasure;
-        this.thumbnailUrl = thumbnailUrl;
-    }
-
     public String getId() {
         return id;
     }
@@ -64,7 +58,7 @@ public class Ingredient {
         this.thumbnailUrl = thumbnailUrl;
     }
 
-    public static List<Ingredient> getIngredients(RandomMealResponse.MealsItem mealsItem) {
+    public static List<Ingredient> getIngredients(MealsItem mealsItem) {
         List<Ingredient> ingredients=new ArrayList<>();
         if(validateIngredient(mealsItem.getStrIngredient1())) {
             ingredients.add(new Ingredient(mealsItem.getStrIngredient1(), mealsItem.getStrMeasure1()));

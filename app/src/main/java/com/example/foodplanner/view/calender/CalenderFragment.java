@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.foodplanner.R;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
@@ -127,11 +128,11 @@ public class CalenderFragment extends Fragment implements CalenderView {
     }
 
     @Override
-    public void onGetAllPlannedMeals(List<RandomMealResponse.MealsItem> plannedMeals, String date) {
+    public void onGetAllPlannedMeals(List<MealsItem> plannedMeals, String date) {
 
-        List<RandomMealResponse.MealsItem> filteredMeals = new ArrayList<>();
+        List<MealsItem> filteredMeals = new ArrayList<>();
 
-        for (RandomMealResponse.MealsItem mealsItem : plannedMeals) {
+        for (MealsItem mealsItem : plannedMeals) {
             if (mealsItem.getDateModified() != null && mealsItem.getDateModified().equalsIgnoreCase(date)) {
                 filteredMeals.add(mealsItem);
             }

@@ -14,10 +14,10 @@ import retrofit2.Response;
 import com.example.foodplanner.api.ApiManager;
 import com.example.foodplanner.api.WebService;
 import com.example.foodplanner.db.FirebaseUtils;
-import com.example.foodplanner.db.SharedPreferencesManager;
 import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.IngredientResponse;
 import com.example.foodplanner.model.dto.MealResponse;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,28 +28,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface MealRemoteDataSource {
-    @NonNull Observable<List<RandomMealResponse.MealsItem>> getMealByCategory(String category);
+    @NonNull Observable<List<MealsItem>> getMealByCategory(String category);
 
     Observable<Object> getMealById(String mealId);
 
-    Observable<List<RandomMealResponse.MealsItem>> getFavMealsFromFireStore();
+    Observable<List<MealsItem>> getFavMealsFromFireStore();
 
-    void addMealToPlan(RandomMealResponse.MealsItem mealsItem,
+    void addMealToPlan(MealsItem mealsItem,
                        OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
 
-    void addMealToFav(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener,
+    void addMealToFav(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener,
                       OnFailureListener onFailureListener);
 
-    Observable<List<RandomMealResponse.MealsItem>> getWeeklyPlannedMealsObservable(String date);
-    void deleteFavoriteMealFromFireStore(RandomMealResponse.MealsItem mealsItem,
+    Observable<List<MealsItem>> getWeeklyPlannedMealsObservable(String date);
+    void deleteFavoriteMealFromFireStore(MealsItem mealsItem,
                                          OnSuccessListener<Void> onSuccessListener,
                                          OnFailureListener onFailureListener);
 
-     void deletePlannedMealFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
-     Observable<List<RandomMealResponse.MealsItem>> searchMeals(String name);
+     void deletePlannedMealFireStore(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
+     Observable<List<MealsItem>> searchMeals(String name);
 
      Observable<List<Ingredient>> getIngredients();
-
+     Observable<List<MealsItem>> getMealsByIngredient(String ingredient);
 
 
     class MealRemoteDataSourceImp implements MealRemoteDataSource {
@@ -64,12 +64,12 @@ public interface MealRemoteDataSource {
         }
 
         @Override
-        public @NonNull Observable<List<RandomMealResponse.MealsItem>> getMealByCategory(String category) {
+        public @NonNull Observable<List<MealsItem>> getMealByCategory(String category) {
             return webService.getAllMealsByCategory(category)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .map(mealResponse -> {
-                        List<RandomMealResponse.MealsItem> meals = new ArrayList<>();
+                        List<MealsItem> meals = new ArrayList<>();
                         if (mealResponse != null && mealResponse.getMeals() != null) {
                             meals.addAll(mealResponse.getMeals());
                         }
@@ -118,25 +118,25 @@ public interface MealRemoteDataSource {
         }
 
         @Override
-        public void addMealToPlan(RandomMealResponse.MealsItem mealsItem,
+        public void addMealToPlan(MealsItem mealsItem,
                                   OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
             FirebaseUtils.addMealToPlan(mealsItem, onSuccessListener, onFailureListener);
         }
 
         @Override
-        public void addMealToFav(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        public void addMealToFav(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
             FirebaseUtils.addMealToFav(mealsItem, onSuccessListener, onFailureListener);
         }
 
         @Override
-        public Observable<List<RandomMealResponse.MealsItem>> getFavMealsFromFireStore() {
-            return Observable.<List<RandomMealResponse.MealsItem>>create(emitter -> FirebaseUtils.getFavMeals(context, task -> {
+        public Observable<List<MealsItem>> getFavMealsFromFireStore() {
+            return Observable.<List<MealsItem>>create(emitter -> FirebaseUtils.getFavMeals(context, task -> {
                 if(task.isSuccessful()){
                     QuerySnapshot  querySnapshot= (QuerySnapshot) task.getResult();
                     if(querySnapshot!=null){
-                        List<RandomMealResponse.MealsItem> mealsItems=new ArrayList<>();
+                        List<MealsItem> mealsItems=new ArrayList<>();
                         for (DocumentSnapshot documentSnapshot:querySnapshot.getDocuments()){
-                            RandomMealResponse.MealsItem mealsItem=documentSnapshot.toObject(RandomMealResponse.MealsItem.class);
+                            MealsItem mealsItem=documentSnapshot.toObject(MealsItem.class);
                             if(mealsItem!=null){
                                 mealsItems.add(mealsItem);
                             }
@@ -153,14 +153,14 @@ public interface MealRemoteDataSource {
             })).subscribeOn(Schedulers.io());
         }
         @Override
-        public Observable<List<RandomMealResponse.MealsItem>> getWeeklyPlannedMealsObservable(String date) {
-            return Observable.create((ObservableOnSubscribe<List<RandomMealResponse.MealsItem>>) emitter -> FirebaseUtils.getWeeklyPlannedMeals(context, date, task -> {
+        public Observable<List<MealsItem>> getWeeklyPlannedMealsObservable(String date) {
+            return Observable.create((ObservableOnSubscribe<List<MealsItem>>) emitter -> FirebaseUtils.getWeeklyPlannedMeals(context, date, task -> {
                 if (task.isSuccessful()) {
                     QuerySnapshot querySnapshot = task.getResult();
                     if (querySnapshot != null) {
-                        List<RandomMealResponse.MealsItem> mealsItems = new ArrayList<>();
+                        List<MealsItem> mealsItems = new ArrayList<>();
                         for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
-                            RandomMealResponse.MealsItem mealsItem = documentSnapshot.toObject(RandomMealResponse.MealsItem.class);
+                            MealsItem mealsItem = documentSnapshot.toObject(MealsItem.class);
                             if (mealsItem != null) {
                                 mealsItems.add(mealsItem);
                             }
@@ -176,17 +176,17 @@ public interface MealRemoteDataSource {
             }, e -> emitter.onError(e.fillInStackTrace()))).subscribeOn(Schedulers.io());
         }
         @Override
-        public void deleteFavoriteMealFromFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        public void deleteFavoriteMealFromFireStore(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
             FirebaseUtils.deleteFavMeal(context, mealsItem.getIdMeal(), onSuccessListener, onFailureListener);
         }
 
         @Override
-        public void deletePlannedMealFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        public void deletePlannedMealFireStore(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
             FirebaseUtils.deletePlannedMeal(context,mealsItem.getIdMeal(),onSuccessListener,onFailureListener);
         }
 
         @Override
-        public Observable<List<RandomMealResponse.MealsItem>> searchMeals(String name) {
+        public Observable<List<MealsItem>> searchMeals(String name) {
             return webService.searchMealByName(name)
                     .map(MealResponse::getMeals)
                     .subscribeOn(Schedulers.io())
@@ -196,6 +196,13 @@ public interface MealRemoteDataSource {
         @Override
         public Observable<List<Ingredient>> getIngredients() {
             return webService.getIngredients().map(IngredientResponse::getMeals);
+        }
+
+        @Override
+        public Observable<List<MealsItem>> getMealsByIngredient(String ingredient) {
+            return webService.getMealsBIngredient(ingredient).map(MealResponse::getMeals).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    ;
         }
 
     }

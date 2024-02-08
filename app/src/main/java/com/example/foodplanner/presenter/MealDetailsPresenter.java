@@ -1,39 +1,40 @@
 package com.example.foodplanner.presenter;
 
-import androidx.annotation.NonNull;
+import android.util.Log;
 
-import com.example.foodplanner.Constants;
-import com.example.foodplanner.model.dto.RandomMealResponse;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.repo.MealRepo;
 import com.example.foodplanner.view.meal_details.MealDetailsView;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public interface MealDetailsPresenter {
-    void addMealToFavorite(RandomMealResponse.MealsItem mealsItem);
+    void addMealToFavorite(MealsItem mealsItem);
 
-    void deleteFavMeals(RandomMealResponse.MealsItem mealItem);
+    void deleteFavMeals(MealsItem mealItem);
 
-    void addMealToWeeklyPlan(RandomMealResponse.MealsItem mealsItem);
+    void addMealToWeeklyPlan(MealsItem mealsItem);
+    public void getMealById(String mealId);
 
-    void addWeeklyPlayMealToFireStore(RandomMealResponse.MealsItem mealsItem);
-    //void addMealToFavFireStore(RandomMealResponse.MealsItem mealsItem);
 
 
     class MealDetailsPresenterImp implements MealDetailsPresenter {
+        private CompositeDisposable compositeDisposable;
         MealRepo mealRepo;
         MealDetailsView mealDetailsView;
 
         public MealDetailsPresenterImp(MealRepo mealRepo, MealDetailsView mealDetailsView) {
             this.mealRepo = mealRepo;
             this.mealDetailsView = mealDetailsView;
+            compositeDisposable=new CompositeDisposable();
         }
 
         @Override
-        public void addMealToFavorite(RandomMealResponse.MealsItem mealsItem) {
+        public void addMealToFavorite(MealsItem mealsItem) {
 
             mealRepo.insertMealToFavRemoteAndLocal(mealsItem).
                     subscribeOn(Schedulers.io())
@@ -41,14 +42,10 @@ public interface MealDetailsPresenter {
                     .subscribe(
                             () -> mealDetailsView.onInsertFavSuccess(),
                             error -> mealDetailsView.onInsertFavError(error.getLocalizedMessage()));
-
-            /*mealRepo.addMealToFavorite(mealsItem).
-                    subscribe(()->mealDetailsView.onInsertFavSuccess(),
-                            error->mealDetailsView.onInsertFavError(error.getLocalizedMessage()));*/
         }
 
         @Override
-        public void deleteFavMeals(RandomMealResponse.MealsItem mealItem) {
+        public void deleteFavMeals(MealsItem mealItem) {
             mealRepo.deleteFromRemoteAndLocal(mealItem)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -59,32 +56,35 @@ public interface MealDetailsPresenter {
         }
 
         @Override
-        public void addMealToWeeklyPlan(RandomMealResponse.MealsItem mealsItem) {
+        public void addMealToWeeklyPlan(MealsItem mealsItem) {
             mealRepo.insertMealToWeeklyPlanRemoteAndLocal(mealsItem).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             () -> mealDetailsView.onPlanMealSuccess(),
                             error -> mealDetailsView.onPlanMealFail(error.getLocalizedMessage()));
-
-            /*mealRepo.addMealToWeeklyPlay(mealsItem)
-                    .subscribe(() -> mealDetailsView.onPlanMealSuccess(), error -> mealDetailsView.onPlanMealFail(error.getLocalizedMessage()));*/
         }
 
         @Override
-        public void addWeeklyPlayMealToFireStore(RandomMealResponse.MealsItem mealsItem) {
-            mealRepo.addMealToWeeklyPlay(mealsItem, Constants.EMAIL,
-                    unused -> mealDetailsView.onPlanMealSuccess(),
-                    e -> mealDetailsView.onPlanMealFail(e.getLocalizedMessage()));
+        public void getMealById(String mealId) {
+            compositeDisposable.add(
+                    mealRepo.getMealById(mealId)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(meal->handleSuccess((MealsItem) meal),
+                                    error->handleError(error)));
+
         }
 
-         /*@Override
-         public void addMealToFavFireStore(RandomMealResponse.MealsItem mealsItem) {
-             mealRepo.addMealToFav(mealsItem, unused -> {
-                 mealDetailsView.onAddToFavSuccessFB();
-                 mealRepo.addMealToFavorite(mealsItem);
-             }, e -> mealDetailsView.onAddToFavFailFB(e.getLocalizedMessage()));
-         }
-     }*/
+
+        private void handleSuccess(MealsItem mealsItems) {
+            mealDetailsView.showMeal(mealsItems);
+        }
+
+        private void handleError(Throwable throwable) {
+            Log.e("MealPresenter", "Error: " + throwable.getLocalizedMessage());
+            mealDetailsView.showError("Error loading meals");
+        }
+
 
     }
 }

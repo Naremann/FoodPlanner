@@ -5,9 +5,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Arrays;
+import java.util.List;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.Ingredient;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.CategoryRemoteDataSourceImp;
@@ -33,18 +36,18 @@ import com.example.foodplanner.presenter.HomePresenter;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class HomeFragment extends Fragment implements HomeView{
+public class HomeFragment extends Fragment implements HomeView {
     ImageView mealImg;
     TextView mealTitle;
     HomePresenter homePresenter;
     MaterialCardView cardView;
     CategoryAdapter categoryAdapter;
-    RecyclerView categoryRecyclerView,ingredRecyclerView;
+    RecyclerView categoryRecyclerView, ingredRecyclerView;
     ProgressBar progressBar;
-    RandomMealResponse.MealsItem mealItem;
+    MealsItem mealItem;
     com.example.foodplanner.view.home.IngredientAdapter ingredientAdapter;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -60,8 +63,8 @@ public class HomeFragment extends Fragment implements HomeView{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        homePresenter=new HomePresenter.HomePresenterImp(this,
-                new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()),new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())),
+        homePresenter = new HomePresenter.HomePresenterImp(this,
+                new MealRepoImp(new RandomMealRemoteDataSourceImp(), new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()), new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())),
                 new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()));
         homePresenter.getRandomMeal();
         homePresenter.getCategories();
@@ -72,47 +75,49 @@ public class HomeFragment extends Fragment implements HomeView{
     }
 
     private void intiViews(View view) {
-        ingredRecyclerView=view.findViewById(R.id.ingredients_recycler_view);
-        ingredientAdapter=new IngredientAdapter(new ArrayList<>());
+        ingredRecyclerView = view.findViewById(R.id.ingredients_recycler_view);
+        ingredientAdapter = new IngredientAdapter(new ArrayList<>());
         ingredRecyclerView.setAdapter(ingredientAdapter);
-        mealImg=view.findViewById(R.id.meal_img);
-        mealTitle=view.findViewById(R.id.meal_title_tv);
-        progressBar=view.findViewById(R.id.recycler_progress_bar);
-        cardView=view.findViewById(R.id.meal_card_view);
-        cardView.setOnClickListener(v -> navigateToMealDetailsFragment());
-        categoryAdapter=new CategoryAdapter(new ArrayList<>());
-        categoryAdapter.onItemClickListener= categoriesItem -> {
-            navigateToCategoryMeal(categoriesItem);
+        ingredientAdapter.onItemClickListener = ingredient -> {
+            homePresenter.getMealsByIngredient(ingredient.getIngredientName());
         };
-        categoryRecyclerView=view.findViewById(R.id.category_recycler_view);
+        mealImg = view.findViewById(R.id.meal_img);
+        mealTitle = view.findViewById(R.id.meal_title_tv);
+        progressBar = view.findViewById(R.id.recycler_progress_bar);
+        cardView = view.findViewById(R.id.meal_card_view);
+        cardView.setOnClickListener(v -> navigateToMealDetailsFragment());
+        categoryAdapter = new CategoryAdapter(new ArrayList<>());
+        categoryAdapter.onItemClickListener = categoriesItem -> {
+            homePresenter.getMealByCategory(categoriesItem.getStrCategory());
+        };
+        categoryRecyclerView = view.findViewById(R.id.category_recycler_view);
         categoryRecyclerView.setAdapter(categoryAdapter);
     }
 
-    private void navigateToCategoryMeal(CategoryResponse.CategoriesItem categoriesItem) {
-        HomeFragmentDirections.ActionHomeFragmentToCategoryMealFragment action=HomeFragmentDirections
-                .actionHomeFragmentToCategoryMealFragment(categoriesItem.getStrCategory()) ;
+    private void navigateToCategoryMeal(MealsItem[] mealsItems) {
+        HomeFragmentDirections.ActionHomeFragmentToCategoryMealFragment action = HomeFragmentDirections
+                .actionHomeFragmentToCategoryMealFragment(mealsItems);
         Navigation.findNavController(requireView()).navigate(action);
 
     }
 
     private void navigateToMealDetailsFragment() {
-           HomeFragmentDirections.ActionHomeFragmentToMealDetailsFragment action =
-                   HomeFragmentDirections.actionHomeFragmentToMealDetailsFragment(mealItem);
-           Navigation.findNavController(requireView()).navigate(action);
+        HomeFragmentDirections.ActionHomeFragmentToMealDetailsFragment action =
+                HomeFragmentDirections.actionHomeFragmentToMealDetailsFragment(mealItem);
+        Navigation.findNavController(requireView()).navigate(action);
     }
 
     @Override
-    public void showSuccessMessage(RandomMealResponse.MealsItem mealsItem) {
-        this.mealItem=mealsItem;
+    public void showSuccessMessage(MealsItem mealsItem) {
+        this.mealItem = mealsItem;
         mealTitle.setText(mealsItem.getStrMeal());
-        Log.e("TAG", "showSuccessMessage: "+mealsItem.getStrImageSource());
-        GlideImage.downloadImageToImageView(mealImg.getContext(),mealsItem.getStrMealThumb(),mealImg);
+        GlideImage.downloadImageToImageView(mealImg.getContext(), mealsItem.getStrMealThumb(), mealImg);
 
     }
 
     @Override
     public void showErrorMessage(String error) {
-        AlertMessage.showToastMessage(error,this.getContext());
+        AlertMessage.showToastMessage(error, this.getContext());
         hideProgressBar(progressBar);
     }
 
@@ -129,7 +134,6 @@ public class HomeFragment extends Fragment implements HomeView{
 
     @Override
     public void showIngredientSuccessMessage(List<Ingredient> ingredients) {
-        Log.e("TAG", "showIngredientSuccessMessage: "+ingredients.get(0).getIngredientName());
         ingredientAdapter.changeData(ingredients);
     }
 
@@ -138,12 +142,44 @@ public class HomeFragment extends Fragment implements HomeView{
         showMessage(localizedMessage);
     }
 
-    void hideProgressBar(ProgressBar progressBar){
+    @Override
+    public void showMealsByIngredientSuccess(List<MealsItem> mealsItems) {
+        ingredientAdapter.onItemClickListener = ingredient -> {
+            homePresenter.getMealsByIngredient(ingredient.getIngredientName());
+            // Navigate to another fragment and send parameter
+            Log.e("TAG", "showMealsByIngredientSuccess: "+mealsItems.get(0).getStrIngredient2());
+            MealsItem[] mealsItem = mealsItems.toArray(new MealsItem[mealsItems.size()]);
+            navigateToCategoryMeal(mealsItem);
+        };
+    }
+
+    @Override
+    public void showMealsByIngredientError(String localizedMessage) {
+
+    }
+
+    @Override
+    public void onMealByCategorySuccess(List<MealsItem> mealsItems) {
+
+        categoryAdapter.onItemClickListener = categoriesItem -> {
+            MealsItem[] mealsItem = mealsItems.toArray(new MealsItem[mealsItems.size()]);
+            Log.e("TAG", "onItemClick: "+mealsItems.get(0).getIdMeal());
+            navigateToCategoryMeal(mealsItem);
+
+        };
+    }
+
+    @Override
+    public void onMealByCategoryFail(String localizedMessage) {
+
+    }
+
+    void hideProgressBar(ProgressBar progressBar) {
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    private void showMessage(String message){
-        AlertMessage.showToastMessage(message,this.getContext());
+    private void showMessage(String message) {
+        AlertMessage.showToastMessage(message, this.getContext());
     }
 
 }

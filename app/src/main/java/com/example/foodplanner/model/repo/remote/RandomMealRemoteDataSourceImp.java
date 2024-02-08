@@ -3,6 +3,7 @@ package com.example.foodplanner.model.repo.remote;
 import com.example.foodplanner.api.ApiManager;
 import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.api.WebService;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 
 import retrofit2.Call;
@@ -17,7 +18,7 @@ public class RandomMealRemoteDataSourceImp implements RandomMealRemoteDataSource
     }
 
     @Override
-    public RandomMealResponse.MealsItem getMeal(MealCallBack mealCallBack) {
+    public MealsItem getMeal(MealCallBack mealCallBack) {
         webService.getRandomMeal().enqueue(new Callback<RandomMealResponse>() {
             @Override
             public void onResponse(Call<RandomMealResponse> call, Response<RandomMealResponse> response) {

@@ -1,9 +1,9 @@
-package com.example.foodplanner.model.dto;
+package com.example.foodplanner.model.dto.filter;
 
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class MealResponse{
+public class FilterResponse{
 
 	@SerializedName("meals")
 	private List<MealsItem> meals;
