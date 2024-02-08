@@ -2,6 +2,7 @@ package com.example.foodplanner.api;
 
 
 import com.example.foodplanner.model.dto.CategoryResponse;
+import com.example.foodplanner.model.dto.IngredientResponse;
 import com.example.foodplanner.model.dto.MealResponse;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 
@@ -25,5 +26,8 @@ public interface WebService {
 
     @GET("/api/json/v1/1/search.php")
     Observable<MealResponse> searchMealByName(@Query("s") String mealName);
+
+    @GET("/api/json/v1/1/list.php?i=list")
+    Observable<IngredientResponse> getIngredients();
 
 }

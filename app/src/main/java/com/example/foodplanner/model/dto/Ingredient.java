@@ -2,16 +2,66 @@ package com.example.foodplanner.model.dto;
 
 import android.util.Log;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Ingredient {
+
+    @SerializedName("idIngredient")
+    private String id;
+    @SerializedName("strIngredient")
     String ingredientName;
     String ingredientMeasure;
+
+    @SerializedName("strDescription")
+    private String description;
+    @SerializedName("strIngredientThumb")
+    private String thumbnailUrl;
 
     public Ingredient(String ingredientName, String ingredientMeasure) {
         this.ingredientName = ingredientName;
         this.ingredientMeasure = ingredientMeasure;
+    }
+
+    public Ingredient(String ingredientName, String ingredientMeasure, String thumbnailUrl) {
+        this.ingredientName = ingredientName;
+        this.ingredientMeasure = ingredientMeasure;
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setIngredientName(String ingredientName) {
+        this.ingredientName = ingredientName;
+    }
+
+    public void setIngredientMeasure(String ingredientMeasure) {
+        this.ingredientMeasure = ingredientMeasure;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getThumbnailUrl() {
+        return "https://www.themealdb.com/images/ingredients/" + ingredientName + ".png";
+
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public static List<Ingredient> getIngredients(RandomMealResponse.MealsItem mealsItem) {

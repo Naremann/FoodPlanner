@@ -15,6 +15,8 @@ import com.example.foodplanner.api.ApiManager;
 import com.example.foodplanner.api.WebService;
 import com.example.foodplanner.db.FirebaseUtils;
 import com.example.foodplanner.db.SharedPreferencesManager;
+import com.example.foodplanner.model.dto.Ingredient;
+import com.example.foodplanner.model.dto.IngredientResponse;
 import com.example.foodplanner.model.dto.MealResponse;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -46,17 +48,19 @@ public interface MealRemoteDataSource {
      void deletePlannedMealFireStore(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
      Observable<List<RandomMealResponse.MealsItem>> searchMeals(String name);
 
+     Observable<List<Ingredient>> getIngredients();
+
 
 
     class MealRemoteDataSourceImp implements MealRemoteDataSource {
         WebService webService;
         Context context;
-        String savedEmail;
+       // String savedEmail;
 
         public MealRemoteDataSourceImp(Context context) {
             this.webService = ApiManager.getApi();
             this.context = context;
-            this.savedEmail=SharedPreferencesManager.getUserEmail(context);
+           // this.savedEmail=SharedPreferencesManager.getUserEmail(context);
         }
 
         @Override
@@ -187,6 +191,11 @@ public interface MealRemoteDataSource {
                     .map(MealResponse::getMeals)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
+        }
+
+        @Override
+        public Observable<List<Ingredient>> getIngredients() {
+            return webService.getIngredients().map(IngredientResponse::getMeals);
         }
 
     }
