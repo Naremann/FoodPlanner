@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.Ingredient;
@@ -16,6 +15,7 @@ import com.example.foodplanner.model.dto.Ingredient;
 import java.util.List;
 
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.ViewHolder> {
+    OnItemClickListener onItemClickListener;
     public IngredientAdapter(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
     }
@@ -34,7 +34,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Vi
         Ingredient ingredient=ingredients.get(position);
         holder.ingredientName.setText(ingredient.getIngredientName());
         GlideImage.downloadImageToImageView(holder.ingredientImg.getContext(),ingredient.getThumbnailUrl(),holder.ingredientImg);
-
+        holder.itemView.setOnClickListener(v -> onItemClickListener.onItemClick(ingredient));
     }
 
     public void changeData(List<Ingredient> ingredients){
@@ -57,5 +57,8 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Vi
             ingredientImg=itemView.findViewById(R.id.ingredient_img);
 
         }
+    }
+    interface OnItemClickListener{
+        void onItemClick(Ingredient ingredient);
     }
 }

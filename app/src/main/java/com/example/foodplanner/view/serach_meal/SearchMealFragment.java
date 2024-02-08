@@ -15,6 +15,7 @@ import android.widget.SearchView;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.Ingredient;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
@@ -109,15 +110,15 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
 
 
     @Override
-    public void showSuccessMessage(RandomMealResponse.MealsItem mealsItem) {
+    public void showSuccessMessage(MealsItem mealsItem) {
 
 
     }
 
     private void navigateToCategoryMeal(String categoriesItem) {
-        SearchMealFragmentDirections.ActionSearchFragment2ToCategoryMealFragment action=SearchMealFragmentDirections
+        /*SearchMealFragmentDirections.ActionSearchFragment2ToCategoryMealFragment action=SearchMealFragmentDirections
                 .actionSearchFragment2ToCategoryMealFragment(categoriesItem) ;
-        Navigation.findNavController(requireView()).navigate(action);
+        Navigation.findNavController(requireView()).navigate(action);*/
 
     }
     @Override
@@ -148,13 +149,33 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
 
     }
 
+    @Override
+    public void showMealsByIngredientSuccess(List<MealsItem> mealsItems) {
+
+    }
+
+    @Override
+    public void showMealsByIngredientError(String localizedMessage) {
+
+    }
+
+    @Override
+    public void onMealByCategorySuccess(List<MealsItem> mealsItems) {
+
+    }
+
+    @Override
+    public void onMealByCategoryFail(String localizedMessage) {
+
+    }
+
     void hideProgressBar(ProgressBar progressBar){
         progressBar.setVisibility(View.INVISIBLE);
     }
 
 
     @Override
-    public void showMeal(List<RandomMealResponse.MealsItem> meals) {
+    public void showMeal(List<MealsItem> meals) {
         mealAdapter.changeData(meals);
     }
 
@@ -164,10 +185,10 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
     }
 
     @Override
-    public void showMealById(RandomMealResponse.MealsItem mealsItem) {
+    public void showMealById(MealsItem mealsItem) {
         navigateToMealDetailsFragment(mealsItem);
     }
-    private void navigateToMealDetailsFragment(RandomMealResponse.MealsItem mealsItems) {
+    private void navigateToMealDetailsFragment(MealsItem mealsItems) {
         SearchMealFragmentDirections.ActionSearchFragment2ToMealDetailsFragment action=SearchMealFragmentDirections
                 .actionSearchFragment2ToMealDetailsFragment(mealsItems) ;
         Navigation.findNavController(requireView()).navigate(action);

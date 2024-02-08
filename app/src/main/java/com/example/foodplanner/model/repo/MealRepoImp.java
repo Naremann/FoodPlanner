@@ -4,9 +4,13 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.foodplanner.api.CategoryCallback;
 import com.example.foodplanner.api.MealCallBack;
+import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.IngredientResponse;
+import com.example.foodplanner.model.dto.MealResponse;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSource;
@@ -38,7 +42,7 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
-    public Completable addMealToFavorite(RandomMealResponse.MealsItem mealsItem) {
+    public Completable addMealToFavorite(MealsItem mealsItem) {
         return mealLocalDataSource.insertProductToFavorite(mealsItem);
     }
 
@@ -53,33 +57,33 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
-    public Completable deleteMealFromFav(RandomMealResponse.MealsItem mealItem) {
+    public Completable deleteMealFromFav(MealsItem mealItem) {
         return mealLocalDataSource.deleteFavoriteProduct(mealItem);
     }
 
     @Override
-    public Completable addMealToWeeklyPlay(RandomMealResponse.MealsItem mealsItem) {
+    public Completable addMealToWeeklyPlay(MealsItem mealsItem) {
         return mealLocalDataSource.addMealToWeekPlan(mealsItem);
     }
 
     @Override
-    public void addMealToFav(RandomMealResponse.MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+    public void addMealToFav(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         mealRemoteDataSource.addMealToPlan(mealsItem,onSuccessListener,onFailureListener);
     }
 
     @Override
-    public void addMealToWeeklyPlay(RandomMealResponse.MealsItem mealsItem, String email, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+    public void addMealToWeeklyPlay(MealsItem mealsItem, String email, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         mealRemoteDataSource.addMealToPlan(mealsItem,onSuccessListener,onFailureListener);
     }
 
     @Override
-    public Observable<List<RandomMealResponse.MealsItem>> getWeeklyPlannedMealsObservable(String date) {
+    public Observable<List<MealsItem>> getWeeklyPlannedMealsObservable(String date) {
         return mealRemoteDataSource.getWeeklyPlannedMealsObservable(date)
                 .doOnSubscribe(disposable -> Log.d("TAG", "Subscribed to Firestore Observable"))
                 .doOnNext(meals -> Log.d("TAG", "Received data from Firestore: " + meals.size() + " items"))
                 .doOnError(error -> Log.e("TAG", "Error fetching data from Firestore", error))
                 .switchIfEmpty(Observable.defer(() -> {
-                    List<RandomMealResponse.MealsItem> localMeals = mealLocalDataSource.getPlannedMealByDate(date).blockingFirst();
+                    List<MealsItem> localMeals = mealLocalDataSource.getPlannedMealByDate(date).blockingFirst();
                     if (localMeals.isEmpty()) {
                         return Observable.empty();
                     } else {
@@ -89,7 +93,7 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
-    public Flowable<List<RandomMealResponse.MealsItem>> getAllFavMeals() {
+    public Flowable<List<MealsItem>> getAllFavMeals() {
         return mealLocalDataSource.getFavMeals()
                 .flatMap(favMeals -> {
                     if (favMeals.isEmpty()) {
@@ -101,7 +105,7 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
-    public Flowable<List<RandomMealResponse.MealsItem>> getAllPlannedMeals(String date) {
+    public Flowable<List<MealsItem>> getAllPlannedMeals(String date) {
         return mealLocalDataSource.getPlannedMealByDate(date)
                 .flatMap(mealsItems -> {
                     if(mealsItems.isEmpty()){
@@ -119,9 +123,23 @@ public class MealRepoImp implements MealRepo{
         return mealRemoteDataSource.getIngredients();
     }
 
+    @Override
+    public Observable<List<MealsItem>> getMealsByIngredient(String ingredient) {
+        return mealRemoteDataSource.getMealsByIngredient(ingredient);
+    }
 
     @Override
-    public Completable deleteFromRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+    public Observable<List<MealsItem>> getMealByCategory(String category) {
+        return mealRemoteDataSource.getMealByCategory(category);
+    }
+
+    @Override
+    public Observable<Object> getMealById(String mealId) {
+        return mealRemoteDataSource.getMealById(mealId);
+    }
+
+    @Override
+    public Completable deleteFromRemoteAndLocal(MealsItem mealsItem) {
         Completable deleteFromRemote=Completable.create(emitter -> {
             mealRemoteDataSource.deleteFavoriteMealFromFireStore(mealsItem, unused -> {
                 emitter.onComplete();
@@ -134,7 +152,7 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
-    public Completable deletePlannedMealRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+    public Completable deletePlannedMealRemoteAndLocal(MealsItem mealsItem) {
         Completable deleteRemote = Completable.create(emitter -> {
             mealRemoteDataSource.deletePlannedMealFireStore(mealsItem, unused -> emitter.onComplete(), e -> emitter.onError(new IllegalStateException(e.getLocalizedMessage())));
         });
@@ -143,7 +161,7 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
-    public Completable insertMealToFavRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+    public Completable insertMealToFavRemoteAndLocal(MealsItem mealsItem) {
         Completable insertRemote=Completable.create(emitter -> {
             mealRemoteDataSource.addMealToFav(mealsItem, unused -> {
                 emitter.onComplete();
@@ -156,7 +174,7 @@ public class MealRepoImp implements MealRepo{
     }
 
     @Override
-    public Completable insertMealToWeeklyPlanRemoteAndLocal(RandomMealResponse.MealsItem mealsItem) {
+    public Completable insertMealToWeeklyPlanRemoteAndLocal(MealsItem mealsItem) {
         mealsItem.setPlanned(true);
        Completable insertRemote=Completable.create(emitter -> {
            mealRemoteDataSource.addMealToPlan(mealsItem, unused -> {
@@ -169,11 +187,11 @@ public class MealRepoImp implements MealRepo{
        return Completable.mergeArray(insertRemote,insertLocal);
     }
 
-    private Flowable<List<RandomMealResponse.MealsItem>> fetchAndSaveFavMealsFromRemote() {
+    private Flowable<List<MealsItem>> fetchAndSaveFavMealsFromRemote() {
         return mealRemoteDataSource.getFavMealsFromFireStore()
                 .flatMapCompletable(mealsItems -> {
                     Completable insertCompletable = Completable.complete();
-                    for (RandomMealResponse.MealsItem mealItem : mealsItems) {
+                    for (MealsItem mealItem : mealsItems) {
                         insertCompletable = insertCompletable
                                 .andThen(mealLocalDataSource.insertProductToFavorite(mealItem));
                     }
@@ -183,11 +201,11 @@ public class MealRepoImp implements MealRepo{
                 .andThen(mealLocalDataSource.getFavMeals());
     }
     @Override
-    public Flowable<List<RandomMealResponse.MealsItem>> fetchAndSavePlannedMealsFromRemote(String date) {
+    public Flowable<List<MealsItem>> fetchAndSavePlannedMealsFromRemote(String date) {
         return mealRemoteDataSource.getWeeklyPlannedMealsObservable(date)
                 .flatMapCompletable(mealsItems -> {
                     Completable insertCompletable = Completable.complete();
-                    for (RandomMealResponse.MealsItem mealsItem : mealsItems) {
+                    for (MealsItem mealsItem : mealsItems) {
                         insertCompletable = insertCompletable.andThen(mealLocalDataSource.addMealToWeekPlan(mealsItem));
                     }
                     return insertCompletable.andThen(Completable.fromAction(() -> {

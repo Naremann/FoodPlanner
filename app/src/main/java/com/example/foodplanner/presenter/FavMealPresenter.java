@@ -1,5 +1,6 @@
 package com.example.foodplanner.presenter;
 
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepo;
 import com.example.foodplanner.view.fav_meal.FavoriteView;
@@ -9,7 +10,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public interface FavMealPresenter {
      void getMeals();
-     void deleteFavMeals(RandomMealResponse.MealsItem mealItem);
+     void deleteFavMeals(MealsItem mealItem);
 
      class FavMealPresenterImp implements FavMealPresenter{
         MealRepo mealRepo;
@@ -24,13 +25,13 @@ public interface FavMealPresenter {
         public void getMeals() {
             mealRepo.getAllFavMeals().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(favMeals->favoriteView.onGetAllFavoriteFireStoreMeals((List<RandomMealResponse.MealsItem>)  favMeals),
+                    .subscribe(favMeals->favoriteView.onGetAllFavoriteFireStoreMeals((List<MealsItem>)  favMeals),
                             error-> favoriteView.onGetAllFavoriteMealsError(error.getLocalizedMessage()));
 
         }
 
         @Override
-        public void deleteFavMeals(RandomMealResponse.MealsItem mealItem) {
+        public void deleteFavMeals(MealsItem mealItem) {
             mealRepo.deleteFromRemoteAndLocal(mealItem)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

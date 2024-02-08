@@ -13,25 +13,22 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodplanner.R;
-import com.example.foodplanner.model.dto.CategoryResponse;
-import com.example.foodplanner.model.dto.RandomMealResponse.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
-import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
-import com.example.foodplanner.presenter.MealPresenter;
-import com.example.foodplanner.view.AlertMessage;
+import com.example.foodplanner.model.dto.MealsItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class CategoryMealFragment extends Fragment implements MealByCategoryView {
+public class MealFragment extends Fragment implements MealView {
 
     //private CategoryResponse.CategoriesItem categoryItem;
     String categoryItem;
     private RecyclerView recyclerView;
     private MealAdapter mealAdapter;
-    private MealPresenter mealPresenter;
+    //private MealPresenter mealPresenter;
+    MealsItem [] mealsItem;
 
-    public CategoryMealFragment() {
+    public MealFragment() {
         // Required empty public constructor
     }
 
@@ -44,60 +41,56 @@ public class CategoryMealFragment extends Fragment implements MealByCategoryView
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initializeDependencies();
-        retrieveCategoryFromArguments();
         initViews(view);
+        retrieveCategoryFromArguments();
+
     }
 
     private void initializeDependencies() {
-        mealPresenter = new MealPresenter.MealPresenterImp(
+        /*mealPresenter = new MealPresenter.MealPresenterImp(
                 new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext()),
                 this
-        );
+        );*/
     }
 
     private void retrieveCategoryFromArguments() {
-        if (getArguments() != null) {
-            //categoryItem = CategoryMealFragmentArgs.fromBundle(getArguments()).getCategory();
+        if(getArguments() !=null){
+            mealsItem= MealFragmentArgs.fromBundle(getArguments()).getMealItem();
+            assert mealsItem != null;
+            Log.d("TAG", "retrieveCategoryFromArguments:"+Arrays.asList(mealsItem).get(0).getStrMeal());
+            mealAdapter.changeData(Arrays.asList(mealsItem));
+        }
+        /*if (getArguments() != null) {
             categoryItem = CategoryMealFragmentArgs.fromBundle(getArguments()).getCategoryName();
             if (categoryItem != null) {
-               // Log.e("TAG", "onViewCreated: " + categoryItem.getStrCategory());
                 mealPresenter.getMealByCategory(categoryItem);
             }
-        }
+        }*/
     }
 
     private void initViews(View view) {
         mealAdapter = new MealAdapter(new ArrayList<>());
         recyclerView = view.findViewById(R.id.meal_recycler_view);
-        mealAdapter.onItemClickListener= mealsItem -> mealPresenter.getMealById(mealsItem.getIdMeal());
+        mealAdapter.onItemClickListener= this::navigateToMealDetailsFragment;
         recyclerView.setAdapter(mealAdapter);
 
     }
 
-    @Override
-    public void showMeal(List<RandomMealResponse.MealsItem> mealsItems) {
+   /* @Override
+    public void showMeal(List<MealsItem> mealsItems) {
         mealAdapter.changeData(mealsItems);
     }
 
     @Override
     public void showError(String error) {
         AlertMessage.showToastMessage(error, requireContext());
-    }
+    }*/
 
-    @Override
-    public void showMealById(RandomMealResponse.MealsItem mealsItems) {
-        navigateToMealDetailsFragment(mealsItems);
-    }
-
-    private void navigateToMealDetailsFragment(RandomMealResponse.MealsItem mealsItems) {
-        CategoryMealFragmentDirections.ActionCategoryMealFragmentToMealDetailsFragment action=CategoryMealFragmentDirections
+    private void navigateToMealDetailsFragment(MealsItem mealsItems) {
+        MealFragmentDirections.ActionCategoryMealFragmentToMealDetailsFragment action=MealFragmentDirections
                 .actionCategoryMealFragmentToMealDetailsFragment(mealsItems) ;
         Navigation.findNavController(requireView()).navigate(action);
 
     }
 
-    @Override
-    public void showErrorOfMealById(String error) {
-        AlertMessage.showToastMessage(error, requireContext());
-    }
 }

@@ -2,6 +2,7 @@ package com.example.foodplanner.db;
 
 import android.content.Context;
 
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -83,8 +84,8 @@ public class FirebaseUtils {
                 }).addOnFailureListener(onFailureListener);
     }
 
-    public static void addMealToFav(RandomMealResponse.MealsItem mealsItem,
-                                     OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener){
+    public static void addMealToFav(MealsItem mealsItem,
+                                    OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener){
 
         if (currentUser != null) {
             getCollectionReference(FAV_COLLECTION_NAME)
@@ -95,7 +96,7 @@ public class FirebaseUtils {
         }
     }
 
-    public static void addMealToPlan(RandomMealResponse.MealsItem mealsItem,
+    public static void addMealToPlan(MealsItem mealsItem,
                                      OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener){
 
            if(mealsItem.getIdMeal()!=null){

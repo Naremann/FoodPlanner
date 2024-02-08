@@ -1,5 +1,9 @@
 package com.example.foodplanner.view.meal_details;
 
+import com.example.foodplanner.model.dto.MealsItem;
+
+import java.util.List;
+
 public interface MealDetailsView {
     void onInsertFavSuccess();
     void onInsertFavError(String error);
@@ -8,4 +12,7 @@ public interface MealDetailsView {
      void onSuccessDeleteFromFav();
      void onFailDeleteFromFav(String error);
 
+    void showMeal(MealsItem mealsItem);
+
+    void showError(String errorLoadingMeals);
 }

@@ -11,17 +11,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 
 import java.util.List;
 
 public class FavMealAdapter extends RecyclerView.Adapter<FavMealAdapter.ViewHolder> {
-    List<RandomMealResponse.MealsItem> mealsItems;
+    List<MealsItem> mealsItems;
     OnDeleteTextClickListener onDeleteTextClickListener;
     OnItemClickListener onItemClickListener;
 
 
-    public FavMealAdapter(List<RandomMealResponse.MealsItem> mealsItems) {
+    public FavMealAdapter(List<MealsItem> mealsItems) {
         this.mealsItems = mealsItems;
     }
 
@@ -35,7 +36,7 @@ public class FavMealAdapter extends RecyclerView.Adapter<FavMealAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-       RandomMealResponse.MealsItem mealItem=mealsItems.get(position);
+       MealsItem mealItem=mealsItems.get(position);
        holder.mealName.setText(mealItem.getStrMeal());
         GlideImage.downloadImageToImageView(holder.mealImg.getContext(),mealItem.getStrMealThumb(),holder.mealImg);
         holder.deleteTv.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +59,7 @@ public class FavMealAdapter extends RecyclerView.Adapter<FavMealAdapter.ViewHold
         return mealsItems.size();
     }
 
-    public void changeData(List<RandomMealResponse.MealsItem> mealsItems){
+    public void changeData(List<MealsItem> mealsItems){
         this.mealsItems=mealsItems;
         notifyDataSetChanged();
     }
@@ -81,9 +82,9 @@ public class FavMealAdapter extends RecyclerView.Adapter<FavMealAdapter.ViewHold
     }
 
     public interface OnDeleteTextClickListener{
-        void onDeleteClick(RandomMealResponse.MealsItem mealsItem);
+        void onDeleteClick(MealsItem mealsItem);
     }
     public interface OnItemClickListener{
-        void onItemClick(RandomMealResponse.MealsItem mealsItem);
+        void onItemClick(MealsItem mealsItem);
     }
 }

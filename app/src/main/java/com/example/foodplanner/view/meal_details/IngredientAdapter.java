@@ -3,11 +3,13 @@ package com.example.foodplanner.view.meal_details;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.Ingredient;
 
@@ -32,6 +34,8 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Vi
         Ingredient ingredient=ingredients.get(position);
         holder.ingredientName.setText(ingredient.getIngredientName());
         holder.ingredientMeasure.setText(ingredient.getIngredientMeasure());
+        GlideImage.downloadImageToImageView(holder.ingredientImg.getContext(),
+                ingredient.getThumbnailUrl(),holder.ingredientImg);
 
     }
 
@@ -45,13 +49,15 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Vi
         return ingredients.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView ingredientName,ingredientMeasure;
+        ImageView ingredientImg;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ingredientName=itemView.findViewById(R.id.ingredient_name_tv);
             ingredientMeasure=itemView.findViewById(R.id.ingredient_measure_tv);
+            ingredientImg=itemView.findViewById(R.id.ingredient_img);
         }
     }
 }

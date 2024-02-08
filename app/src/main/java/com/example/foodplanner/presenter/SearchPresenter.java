@@ -1,5 +1,6 @@
 package com.example.foodplanner.presenter;
 
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.view.serach_meal.SearchMealView;
@@ -29,9 +30,9 @@ public interface SearchPresenter {
         @Override
         public void searchMealByName(String name) {
             compositeDisposable.add(mealRemoteDataSource.searchMeals(name)
-                    .subscribeWith(new DisposableObserver<List<RandomMealResponse.MealsItem>>() {
+                    .subscribeWith(new DisposableObserver<List<MealsItem>>() {
                         @Override
-                        public void onNext(List<RandomMealResponse.MealsItem> meals) {
+                        public void onNext(List<MealsItem> meals) {
                             searchMealView.showMeal(meals);
                         }
 
@@ -60,7 +61,7 @@ public interface SearchPresenter {
             );
         }
         private void handleMealByIdSuccess(Object o) {
-            searchMealView.showMealById((RandomMealResponse.MealsItem)o);
+            searchMealView.showMealById((MealsItem) o);
         }
         private void handleError(Throwable throwable) {
             searchMealView.showError("Error loading meals");

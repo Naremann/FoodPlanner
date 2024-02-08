@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.example.foodplanner.R;
 import com.example.foodplanner.db.SharedPreferencesManager;
+import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
@@ -66,7 +67,7 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
         recyclerView.setLayoutManager(layoutManager);
     }
 
-    private void deleteMealFromFav(RandomMealResponse.MealsItem mealsItem) {
+    private void deleteMealFromFav(MealsItem mealsItem) {
         String title="Are you sure you want to delete the meal from your favorites?";
         AlertMessage.showCustomAlertDialog(getContext(),title,"Yes", (dialog, which) -> favMealPresenter.deleteFavMeals(mealsItem));
         SharedPreferencesManager.saveFavoriteStatus(this.requireContext(),false,mealsItem.getIdMeal());
@@ -83,7 +84,7 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
     }
 
     @Override
-    public void onGetAllFavoriteMeals(List<RandomMealResponse.MealsItem> favoriteMeals) {
+    public void onGetAllFavoriteMeals(List<MealsItem> favoriteMeals) {
         favMealAdapter.changeData(favoriteMeals);
     }
 
@@ -93,7 +94,7 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
     }
 
     @Override
-    public void onGetAllFavoriteFireStoreMeals(List<RandomMealResponse.MealsItem> favoriteMeals) {
+    public void onGetAllFavoriteFireStoreMeals(List<MealsItem> favoriteMeals) {
         favMealAdapter.changeData(favoriteMeals);
     }
 
@@ -104,7 +105,7 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
     }
 
 
-    private void navigateToMealDetailsFragment(RandomMealResponse.MealsItem mealsItems) {
+    private void navigateToMealDetailsFragment(MealsItem mealsItems) {
         FavoriteMealsFragmentDirections.ActionFavoriteMealsFragmentToMealDetailsFragment action=FavoriteMealsFragmentDirections
                 .actionFavoriteMealsFragmentToMealDetailsFragment(mealsItems) ;
         Navigation.findNavController(requireView()).navigate(action);

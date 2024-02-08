@@ -30,4 +30,7 @@ public interface WebService {
     @GET("/api/json/v1/1/list.php?i=list")
     Observable<IngredientResponse> getIngredients();
 
+    @GET("/api/json/v1/1/filter.php")
+    Observable<MealResponse> getMealsBIngredient(@Query("i") String ingredient);
+
 }
