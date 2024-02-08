@@ -89,10 +89,45 @@ mmmmmmmmmmmmmmmmmm"
            android:layout_marginTop="5dp"
            android:orientation="horizontal"
            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-           app:spanCount="2"
+           app:spanCount="4"
            tools:listitem="@layout/category_item"
-
            />
+
+
+
+       <ProgressBar
+           android:id="@+id/ingredient_progress_bar"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:layout_constraintTop_toTopOf="@id/ingredients_recycler_view"
+           app:layout_constraintBottom_toBottomOf="@id/ingredients_recycler_view"
+           app:layout_constraintStart_toStartOf="@id/ingredients_recycler_view"
+           app:layout_constraintEnd_toEndOf="@id/ingredients_recycler_view"
+           />
+       <TextView
+           android:id="@+id/ingredient_tv"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:layout_constraintTop_toBottomOf="@id/category_recycler_view"
+           app:layout_constraintStart_toStartOf="parent"
+           android:text="@string/ingredients"
+           android:layout_marginTop="25dp"
+           android:textColor="@color/orange"
+           android:textSize="25sp"
+           android:textStyle="bold"
+           />
+       <androidx.recyclerview.widget.RecyclerView
+           android:id="@+id/ingredients_recycler_view"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           app:layout_constraintTop_toBottomOf="@id/ingredient_tv"
+           android:layout_marginTop="5dp"
+           android:orientation="horizontal"
+           app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+           app:spanCount="4"
+           tools:listitem="@layout/category_item"
+           />
+
 
    </androidx.constraintlayout.widget.ConstraintLayout>
 

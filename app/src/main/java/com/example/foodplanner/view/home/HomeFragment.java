@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.foodplanner.model.dto.CategoryResponse;
+import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.CategoryRemoteDataSourceImp;
@@ -28,8 +29,7 @@ import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
-import com.example.foodplanner.presenter.home.HomePresenter;
-import com.example.foodplanner.presenter.home.HomePresenterImp;
+import com.example.foodplanner.presenter.HomePresenter;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
@@ -40,12 +40,11 @@ public class HomeFragment extends Fragment implements HomeView{
     TextView mealTitle;
     HomePresenter homePresenter;
     MaterialCardView cardView;
-    public Navigator navigator;
     CategoryAdapter categoryAdapter;
-    RecyclerView categoryRecyclerView;
+    RecyclerView categoryRecyclerView,ingredRecyclerView;
     ProgressBar progressBar;
-    NavController navController;
     RandomMealResponse.MealsItem mealItem;
+    com.example.foodplanner.view.home.IngredientAdapter ingredientAdapter;
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -61,17 +60,21 @@ public class HomeFragment extends Fragment implements HomeView{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        homePresenter=new HomePresenterImp(this,
+        homePresenter=new HomePresenter.HomePresenterImp(this,
                 new MealRepoImp(new RandomMealRemoteDataSourceImp(),new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()),new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())),
                 new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()));
         homePresenter.getRandomMeal();
         homePresenter.getCategories();
+        homePresenter.getIngredients();
         intiViews(view);
 
 
     }
 
     private void intiViews(View view) {
+        ingredRecyclerView=view.findViewById(R.id.ingredients_recycler_view);
+        ingredientAdapter=new IngredientAdapter(new ArrayList<>());
+        ingredRecyclerView.setAdapter(ingredientAdapter);
         mealImg=view.findViewById(R.id.meal_img);
         mealTitle=view.findViewById(R.id.meal_title_tv);
         progressBar=view.findViewById(R.id.recycler_progress_bar);
@@ -121,10 +124,26 @@ public class HomeFragment extends Fragment implements HomeView{
 
     @Override
     public void showCategoryErrorMessage(String error) {
-        AlertMessage.showToastMessage(error,this.getContext());
+        showMessage(error);
     }
+
+    @Override
+    public void showIngredientSuccessMessage(List<Ingredient> ingredients) {
+        Log.e("TAG", "showIngredientSuccessMessage: "+ingredients.get(0).getIngredientName());
+        ingredientAdapter.changeData(ingredients);
+    }
+
+    @Override
+    public void showIngredientsErrorMessage(String localizedMessage) {
+        showMessage(localizedMessage);
+    }
+
     void hideProgressBar(ProgressBar progressBar){
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void showMessage(String message){
+        AlertMessage.showToastMessage(message,this.getContext());
     }
 
 }

@@ -2,26 +2,33 @@ package com.example.foodplanner.model.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-/*public class MealsItem{
+public class MealsItem{
 
-	@SerializedName("strMealThumb")
-	private String strMealThumb;
+	@SerializedName("strDescription")
+	private String strDescription;
 
-	@SerializedName("idMeal")
-	private String idMeal;
+	@SerializedName("strIngredient")
+	private String strIngredient;
 
-	@SerializedName("strMeal")
-	private String strMeal;
+	@SerializedName("strType")
+	private Object strType;
 
-	public String getStrMealThumb(){
-		return strMealThumb;
+	@SerializedName("idIngredient")
+	private String idIngredient;
+
+	public String getStrDescription(){
+		return strDescription;
 	}
 
-	public String getIdMeal(){
-		return idMeal;
+	public String getStrIngredient(){
+		return strIngredient;
 	}
 
-	public String getStrMeal(){
-		return strMeal;
+	public Object getStrType(){
+		return strType;
 	}
-}*/
+
+	public String getIdIngredient(){
+		return idIngredient;
+	}
+}

@@ -8,15 +8,13 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.CategoryResponse;
+import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
@@ -25,8 +23,7 @@ import com.example.foodplanner.model.repo.remote.CategoryRepo;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.SearchPresenter;
-import com.example.foodplanner.presenter.home.HomePresenter;
-import com.example.foodplanner.presenter.home.HomePresenterImp;
+import com.example.foodplanner.presenter.HomePresenter;
 import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.view.home.CategoryAdapter;
 import com.example.foodplanner.view.home.HomeView;
@@ -66,7 +63,7 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
 
 
     private void initDependencies() {
-        homePresenter=new HomePresenterImp(this,
+        homePresenter=new HomePresenter.HomePresenterImp(this,
                 new MealRepoImp(
                         new RandomMealRemoteDataSourceImp(),
                         new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()),new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())),
@@ -140,6 +137,17 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
         AlertMessage.showToastMessage(error,this.getContext());
         hideProgressBar(categoryProgressBar);
     }
+
+    @Override
+    public void showIngredientSuccessMessage(List<Ingredient> ingredients) {
+
+    }
+
+    @Override
+    public void showIngredientsErrorMessage(String localizedMessage) {
+
+    }
+
     void hideProgressBar(ProgressBar progressBar){
         progressBar.setVisibility(View.INVISIBLE);
     }

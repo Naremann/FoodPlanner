@@ -1,6 +1,8 @@
 package com.example.foodplanner.model.repo;
 
 import com.example.foodplanner.api.MealCallBack;
+import com.example.foodplanner.model.dto.Ingredient;
+import com.example.foodplanner.model.dto.IngredientResponse;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,9 +32,7 @@ public interface MealRepo {
     Completable deletePlannedMealRemoteAndLocal(RandomMealResponse.MealsItem mealsItem);
     Completable insertMealToFavRemoteAndLocal(RandomMealResponse.MealsItem mealsItem);
     Completable insertMealToWeeklyPlanRemoteAndLocal(RandomMealResponse.MealsItem mealsItem);
-
-
     Flowable<List<RandomMealResponse.MealsItem>> fetchAndSavePlannedMealsFromRemote(String date);
-
     Flowable<List<RandomMealResponse.MealsItem>> getAllPlannedMeals(String date);
+    Observable<List<Ingredient>> getIngredients();
 }

@@ -5,6 +5,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.foodplanner.api.MealCallBack;
+import com.example.foodplanner.model.dto.Ingredient;
+import com.example.foodplanner.model.dto.IngredientResponse;
 import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSource;
@@ -112,6 +114,10 @@ public class MealRepoImp implements MealRepo{
                 ;
     }
 
+    @Override
+    public Observable<List<Ingredient>> getIngredients() {
+        return mealRemoteDataSource.getIngredients();
+    }
 
 
     @Override
