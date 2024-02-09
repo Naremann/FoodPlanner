@@ -1,7 +1,6 @@
 package com.example.foodplanner.presenter;
 
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepo;
 import com.example.foodplanner.view.fav_meal.FavoriteView;
 import java.util.List;

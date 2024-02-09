@@ -5,7 +5,6 @@ import android.content.Context;
 import com.example.foodplanner.db.MealDao;
 import com.example.foodplanner.db.MyDatabase;
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;

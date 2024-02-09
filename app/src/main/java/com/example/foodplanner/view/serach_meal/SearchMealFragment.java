@@ -14,9 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.CategoryResponse;
-import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.CategoryRemoteDataSourceImp;
@@ -24,23 +22,21 @@ import com.example.foodplanner.model.repo.remote.CategoryRepo;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.SearchPresenter;
-import com.example.foodplanner.presenter.HomePresenter;
 import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.view.home.CategoryAdapter;
-import com.example.foodplanner.view.home.HomeView;
 import com.example.foodplanner.view.meal_by_category.MealAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchMealFragment extends Fragment implements HomeView , SearchMealView {
+public class SearchMealFragment extends Fragment implements  SearchMealView {
 
-    HomePresenter homePresenter;
     CategoryAdapter categoryAdapter;
     RecyclerView categoryRecyclerView,mealRecyclerView;
     SearchView searchBar;
     SearchPresenter searchPresenter;
     MealAdapter mealAdapter;
     ProgressBar categoryProgressBar;
+    OnMealByCategoryClick onMealByCategoryClick;
 
     public SearchMealFragment() {
         // Required empty public constructor
@@ -64,25 +60,32 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
 
 
     private void initDependencies() {
-        homePresenter=new HomePresenter.HomePresenterImp(this,
-                new MealRepoImp(
-                        new RandomMealRemoteDataSourceImp(),
-                        new MealLocalDatasource.MealLocalDataSourceImp(this.getContext()),new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())),
-                new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()));
-        homePresenter.getCategories();
         searchPresenter=new SearchPresenter.
-                SearchPresenterImp(new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext()),
-                this);
+                SearchPresenterImp(
+                this,new CategoryRepo.CategoryRepoImp(new CategoryRemoteDataSourceImp()),new MealRepoImp(
+                        new RandomMealRemoteDataSourceImp(),
+                new MealLocalDatasource.MealLocalDataSourceImp(requireContext()),
+                new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())));
+        searchPresenter.getCategories();
     }
 
 
     private void intiViews(View view) {
+        initCategoryRecyclerView(view);
         categoryProgressBar=view.findViewById(R.id.category_progress_bar);
-        searchBar=view.findViewById(R.id.search_view);
+        initMealRecyclerView(view);
+        initSearchView(view);
+    }
+
+    private void initMealRecyclerView(View view) {
         mealAdapter=new MealAdapter(new ArrayList<>());
         mealRecyclerView=view.findViewById(R.id.recycler_view_meal);
         mealAdapter.onItemClickListener= mealsItem -> searchPresenter.getMealById(mealsItem.getIdMeal());
         mealRecyclerView.setAdapter(mealAdapter);
+    }
+
+    private void initSearchView(View view) {
+        searchBar=view.findViewById(R.id.search_view);
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -98,34 +101,33 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
                 return true;
             }
         });
+    }
 
-
-
-    categoryAdapter=new CategoryAdapter(new ArrayList<>());
-        categoryAdapter.onItemClickListener= categoriesItem -> navigateToCategoryMeal(categoriesItem.getStrCategory());
-        categoryRecyclerView=view.findViewById(R.id.recyclerview_meals);
+    private void initCategoryRecyclerView(View view) {
+        categoryAdapter = new CategoryAdapter(new ArrayList<>());
+        categoryRecyclerView = view.findViewById(R.id.recyclerview_meals);
         categoryRecyclerView.setAdapter(categoryAdapter);
+        categoryAdapter.onItemClickListener = categoriesItem -> {
+            searchPresenter.getMealByCategory(categoriesItem.getStrCategory());
+            onMealByCategoryClick= mealsItems -> {
+                MealsItem[] mealsItem = mealsItems.toArray(new MealsItem[mealsItems.size()]);
+                navigateToMealFragment(mealsItem);
+            };
+
+        };
     }
 
 
 
-    @Override
-    public void showSuccessMessage(MealsItem mealsItem) {
 
 
-    }
-
-    private void navigateToCategoryMeal(String categoriesItem) {
-        /*SearchMealFragmentDirections.ActionSearchFragment2ToCategoryMealFragment action=SearchMealFragmentDirections
-                .actionSearchFragment2ToCategoryMealFragment(categoriesItem) ;
-        Navigation.findNavController(requireView()).navigate(action);*/
+    private void navigateToMealFragment(MealsItem[] mealsItems) {
+        SearchMealFragmentDirections.ActionSearchFragment2ToCategoryMealFragment action=SearchMealFragmentDirections
+                .actionSearchFragment2ToCategoryMealFragment(mealsItems);
+        Navigation.findNavController(requireView()).navigate(action);
 
     }
-    @Override
-    public void showErrorMessage(String error) {
-        AlertMessage.showToastMessage(error,this.getContext());
-        //hideProgressBar(progressBar);
-    }
+
 
     @Override
     public void showCategorySuccessMessage(List<CategoryResponse.CategoriesItem> categoriesItems) {
@@ -139,36 +141,16 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
         hideProgressBar(categoryProgressBar);
     }
 
-    @Override
-    public void showIngredientSuccessMessage(List<Ingredient> ingredients) {
-
-    }
-
-    @Override
-    public void showIngredientsErrorMessage(String localizedMessage) {
-
-    }
-
-    @Override
-    public void showMealsByIngredientSuccess(List<MealsItem> mealsItems) {
-
-    }
-
-    @Override
-    public void showMealsByIngredientError(String localizedMessage) {
-
-    }
 
     @Override
     public void onMealByCategorySuccess(List<MealsItem> mealsItems) {
-
+        onMealByCategoryClick.onItemClick(mealsItems);
     }
 
     @Override
     public void onMealByCategoryFail(String localizedMessage) {
-
+        showMessage(localizedMessage);
     }
-
     void hideProgressBar(ProgressBar progressBar){
         progressBar.setVisibility(View.INVISIBLE);
     }
@@ -181,17 +163,31 @@ public class SearchMealFragment extends Fragment implements HomeView , SearchMea
 
     @Override
     public void showError(String message) {
-
+        showMessage(message);
     }
 
     @Override
     public void showMealById(MealsItem mealsItem) {
         navigateToMealDetailsFragment(mealsItem);
     }
+
+    @Override
+    public void showMealsByCountryError(String localizedMessage) {
+        showMessage(localizedMessage);
+    }
+
     private void navigateToMealDetailsFragment(MealsItem mealsItems) {
         SearchMealFragmentDirections.ActionSearchFragment2ToMealDetailsFragment action=SearchMealFragmentDirections
                 .actionSearchFragment2ToMealDetailsFragment(mealsItems) ;
         Navigation.findNavController(requireView()).navigate(action);
 
+    }
+
+    interface OnMealByCategoryClick {
+        void onItemClick(List<MealsItem> mealsItems);
+    }
+
+    void showMessage(String msg){
+        AlertMessage.showToastMessage(msg,requireContext());
     }
 }

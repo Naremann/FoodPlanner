@@ -16,17 +16,14 @@ import android.widget.Button;
 
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepoImp;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.CalenderPresenter;
 import com.example.foodplanner.view.AlertMessage;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class CalenderFragment extends Fragment implements CalenderView {

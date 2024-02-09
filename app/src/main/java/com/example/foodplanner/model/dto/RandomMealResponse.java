@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class RandomMealResponse{
+/*public class RandomMealResponse{
 
 	@SerializedName("meals")
 	private List<MealsItem> meals;
@@ -25,4 +25,4 @@ public class RandomMealResponse{
 
 
 
-}
+}*/

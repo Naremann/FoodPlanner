@@ -65,9 +65,10 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
         initViews(view);
         if (getArguments() != null) {
             mealsItem = MealDetailsFragmentArgs.fromBundle(getArguments()).getMeal();
-                mealDetailsPresenter.getMealById(mealsItem.getIdMeal());
-                isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext(), mealsItem.getIdMeal());
-            updateHeartIconVisibility(mealsItem);
+
+            mealDetailsPresenter.getMealById(mealsItem.getIdMeal());
+                    isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext(), mealsItem.getIdMeal());
+                updateHeartIconVisibility(mealsItem);
             emptyHeartImg.setOnClickListener(v -> {
                addMealToFavorite(mealsItem);
             });
@@ -223,17 +224,19 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
 
 
     private void updateHeartIconVisibility(MealsItem mealsItem) {
-        if (isFavorite) {
-            fillHeartImg.setVisibility(View.VISIBLE);
-            emptyHeartImg.setVisibility(View.INVISIBLE);
-        } else {
-            if(mealsItem.isFavorite()){
+        if(mealsItem!=null){
+            if (isFavorite) {
                 fillHeartImg.setVisibility(View.VISIBLE);
                 emptyHeartImg.setVisibility(View.INVISIBLE);
-            }
-            else {
-                fillHeartImg.setVisibility(View.INVISIBLE);
-                emptyHeartImg.setVisibility(View.VISIBLE);
+            } else {
+                if(mealsItem.isFavorite()){
+                    fillHeartImg.setVisibility(View.VISIBLE);
+                    emptyHeartImg.setVisibility(View.INVISIBLE);
+                }
+                else {
+                    fillHeartImg.setVisibility(View.INVISIBLE);
+                    emptyHeartImg.setVisibility(View.VISIBLE);
+                }
             }
         }
     }

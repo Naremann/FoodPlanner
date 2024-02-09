@@ -1,10 +1,9 @@
 package com.example.foodplanner.view.home;
 
 import com.example.foodplanner.model.dto.CategoryResponse;
+import com.example.foodplanner.model.dto.Country;
 import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
-
 import java.util.List;
 
 public interface HomeView {
@@ -24,4 +23,12 @@ public interface HomeView {
     void onMealByCategorySuccess(List<MealsItem> mealsItems);
 
     void onMealByCategoryFail(String localizedMessage);
+
+    void showCountriesSuccessMessage(List<Country> countries);
+
+    void showCountriesErrorMessage(String localizedMessage);
+
+    void showMealsByCountryError(String localizedMessage);
+
+    void showMealsByCountrySuccess(List<MealsItem> mealsItems);
 }

@@ -1,12 +1,11 @@
 package com.example.foodplanner.presenter;
 
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
+import com.example.foodplanner.model.repo.MealRepo;
+import com.example.foodplanner.model.repo.remote.CategoryRepo;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.view.serach_meal.SearchMealView;
-
 import java.util.List;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -16,20 +15,26 @@ public interface SearchPresenter {
     void searchMealByName(String name);
      void getMealById(String idMeal);
 
-     class SearchPresenterImp implements SearchPresenter{
-        MealRemoteDataSource mealRemoteDataSource;
+    void getCategories();
+
+    void getMealByCategory(String strCategory);
+
+    class SearchPresenterImp implements SearchPresenter  {
         SearchMealView searchMealView;
         CompositeDisposable compositeDisposable;
+        CategoryRepo categoryRepo;
+        MealRepo mealRepo;
 
-        public SearchPresenterImp(MealRemoteDataSource mealRemoteDataSource, SearchMealView searchMealView) {
-            this.mealRemoteDataSource = mealRemoteDataSource;
+        public SearchPresenterImp(SearchMealView searchMealView,CategoryRepo categoryRepo,MealRepo mealRepo) {
             this.searchMealView = searchMealView;
             this.compositeDisposable = new CompositeDisposable();
+            this.categoryRepo=categoryRepo;
+            this.mealRepo=mealRepo;
         }
 
         @Override
         public void searchMealByName(String name) {
-            compositeDisposable.add(mealRemoteDataSource.searchMeals(name)
+            compositeDisposable.add(mealRepo.searchMeals(name)
                     .subscribeWith(new DisposableObserver<List<MealsItem>>() {
                         @Override
                         public void onNext(List<MealsItem> meals) {
@@ -51,7 +56,7 @@ public interface SearchPresenter {
         @Override
         public void getMealById(String idMeal) {
             compositeDisposable.add(
-                    mealRemoteDataSource.getMealById(idMeal)
+                    mealRepo.getMealById(idMeal)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
@@ -70,5 +75,27 @@ public interface SearchPresenter {
         public void onDestroy() {
             compositeDisposable.clear();
         }
+
+         @Override
+         public void getCategories() {
+             compositeDisposable.add(categoryRepo.getCategories().subscribeOn(Schedulers.io())
+                     .subscribeOn(Schedulers.io()).
+                     observeOn(AndroidSchedulers.mainThread()).
+                     subscribe(categoriesItems ->  searchMealView.showCategorySuccessMessage(categoriesItems),
+                             error->searchMealView.showCategoryErrorMessage(error.getLocalizedMessage())));
+         }
+
+        @Override
+        public void getMealByCategory(String strCategory) {
+
+            compositeDisposable.add(
+                    mealRepo.getMealByCategory(strCategory)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(mealsItems -> searchMealView.onMealByCategorySuccess(mealsItems),
+                                    error->searchMealView.onMealByCategoryFail(error.getLocalizedMessage())));
+
+        }
+
     }
 }
