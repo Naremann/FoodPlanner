@@ -20,6 +20,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.example.foodplanner.Constants;
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.YouTubeVideo;
@@ -63,6 +65,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
         super.onViewCreated(view, savedInstanceState);
         initDependencies();
         initViews(view);
+
         if (getArguments() != null) {
             mealsItem = MealDetailsFragmentArgs.fromBundle(getArguments()).getMeal();
 
@@ -77,6 +80,16 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
                 
             });
 
+        }
+        checkUser();
+
+    }
+
+    private void checkUser() {
+        String user= SharedPreferencesManager.getUserEmail(requireContext());
+        if(user.equals(Constants.GUEST)){
+            emptyHeartImg.setVisibility(View.GONE);
+            planImg.setVisibility(View.GONE);
         }
 
     }
