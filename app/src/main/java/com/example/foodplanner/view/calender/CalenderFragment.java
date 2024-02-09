@@ -1,19 +1,22 @@
 package com.example.foodplanner.view.calender;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.foodplanner.view.bottom_sheet.BottomSheetDismissListener;
+import com.example.foodplanner.view.bottom_sheet.BottomSheetFragment;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.repo.MealRepoImp;
@@ -22,6 +25,7 @@ import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.CalenderPresenter;
 import com.example.foodplanner.view.AlertMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +81,7 @@ public class CalenderFragment extends Fragment implements CalenderView {
     }
 
     private void initViews(View view) {
+        initDayButtons(view);
         calenderAdapter = new CalenderAdapter(new ArrayList<>());
         recyclerViewSat = view.findViewById(R.id.recycler_view);
         recyclerViewSun = view.findViewById(R.id.recycler_view_sun);
@@ -110,9 +115,49 @@ public class CalenderFragment extends Fragment implements CalenderView {
         recyclerViewThurs.setAdapter(adapterThu);
         recyclerViewFri.setAdapter(adapterFri);
 
-
-
     }
+
+    private void initDayButtons(View view) {
+        satBtn=view.findViewById(R.id.sat_btn);
+        satBtn.setOnClickListener(v -> navigateToBottomSheetFragment(view,"Sat"));
+        sunBtn=view.findViewById(R.id.sun_btn);
+        sunBtn.setOnClickListener(v -> navigateToBottomSheetFragment(view,"Sun"));
+
+        monBtn=view.findViewById(R.id.mon_btn);
+        monBtn.setOnClickListener(v -> navigateToBottomSheetFragment(view,"Mon"));
+
+        tuesBtn=view.findViewById(R.id.tue_btn);
+        tuesBtn.setOnClickListener(v -> navigateToBottomSheetFragment(view,"Tue"));
+
+        wedBun=view.findViewById(R.id.wed_btn);
+        wedBun.setOnClickListener(v -> navigateToBottomSheetFragment(view,"Wen"));
+
+        thursBtn=view.findViewById(R.id.thurs_btn);
+        thursBtn.setOnClickListener(v -> navigateToBottomSheetFragment(view,"Thu"));
+        thursBtn.setOnClickListener(v -> navigateToBottomSheetFragment(view,"Thu"));
+
+        friBtn=view.findViewById(R.id.fri_btn);
+        friBtn.setOnClickListener(v -> navigateToBottomSheetFragment(view,"Fri"));
+    }
+    private void navigateToBottomSheetFragment(View view,String day){
+        NavController navController = Navigation.findNavController(view);
+        Bundle args = new Bundle();
+        args.putString("day", day);
+        navController.navigate(R.id.action_calenderFragment_to_bottomSheetFragment, args);
+
+
+
+       /* Bundle args = new Bundle();
+        args.putString("day", day);
+        NavOptions navOptions = new NavOptions.Builder().setLaunchSingleTop(true).build();
+        NavController navController = Navigation.findNavController(view);
+        navController.navigate(R.id.bottomSheetFragment, args, navOptions);*/
+
+        //BottomSheetFragment bottomSheetFragment = new BottomSheetFragment();
+        //bottomSheetFragment.show(requireActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
+       /* NavController navController=Navigation.findNavController(requireActivity(),R.id.nav_host_fragment);
+        navController.navigate(R.id.bottomSheetFragment);*/
+    };
 
     private CalenderAdapter.OnCancelClickListener createOnCancelClickListener() {
         return mealsItem -> {
@@ -159,31 +204,6 @@ public class CalenderFragment extends Fragment implements CalenderView {
                 break;
     }
 
-        /*switch (date) {
-            case "Sat":
-                recyclerViewSat.setAdapter(new CalenderAdapter(filteredMeals));
-                break;
-            case "Sun":
-                recyclerViewSun.setAdapter(new CalenderAdapter(filteredMeals));
-                break;
-            case "Mon":
-                recyclerViewMon.setAdapter(new CalenderAdapter(filteredMeals));
-                break;
-            case "Tue":
-                recyclerViewTues.setAdapter(new CalenderAdapter(filteredMeals));
-                break;
-            case "Wed":
-                recyclerViewWed.setAdapter(new CalenderAdapter(filteredMeals));
-                break;
-            case "Thu":
-                recyclerViewThurs.setAdapter(new CalenderAdapter(filteredMeals));
-                break;
-            case "Fri":
-                recyclerViewFri.setAdapter(new CalenderAdapter(filteredMeals));
-                break;
-        }*/
-
-
     }
 
 
@@ -221,4 +241,7 @@ public class CalenderFragment extends Fragment implements CalenderView {
     private void showMsg(String message){
         AlertMessage.showToastMessage(message,getContext());
     }
+
+
+
 }
