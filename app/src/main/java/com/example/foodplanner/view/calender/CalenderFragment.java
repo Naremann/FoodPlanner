@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,8 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.foodplanner.view.bottom_sheet.BottomSheetDismissListener;
-import com.example.foodplanner.view.bottom_sheet.BottomSheetFragment;
+import com.example.foodplanner.Constants;
+import com.example.foodplanner.db.SharedPreferencesManager;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.repo.MealRepoImp;
@@ -34,7 +33,6 @@ public class CalenderFragment extends Fragment implements CalenderView {
     CalenderAdapter calenderAdapter;
     RecyclerView recyclerViewSat, recyclerViewSun, recyclerViewMon, recyclerViewTues, recyclerViewWed, recyclerViewThurs, recyclerViewFri;
     Button satBtn, sunBtn, monBtn, tuesBtn, wedBun, thursBtn, friBtn;
-    String date;
     CalenderPresenter calenderPresenter;
     CalenderAdapter adapterSat;
     CalenderAdapter adapterSun;
@@ -64,6 +62,8 @@ public class CalenderFragment extends Fragment implements CalenderView {
         super.onViewCreated(view, savedInstanceState);
         initDependencies();
         initViews(view);
+        checkUser();
+
     }
 
     private void initDependencies() {
@@ -78,6 +78,23 @@ public class CalenderFragment extends Fragment implements CalenderView {
         calenderPresenter.getPlannedMealsByDate("Thu");
         calenderPresenter.getPlannedMealsByDate("Fri");
 
+    }
+    private void checkUser() {
+        String user= SharedPreferencesManager.getUserEmail(requireContext());
+        if(user.equals(Constants.GUEST)){
+            showClickButtonsMessage();
+        }
+
+    }
+
+    private void showClickButtonsMessage() {
+        sunBtn.setOnClickListener(v -> showMsg("You cannot add a meal to the weekly plan. Log in first so you can add meals to the weekly plans"));
+        satBtn.setOnClickListener(v -> showMsg("You cannot add a meal to the weekly plan. Log in first so you can add meals to the weekly plans"));
+        monBtn.setOnClickListener(v -> showMsg("You cannot add a meal to the weekly plan. Log in first so you can add meals to the weekly plans"));
+        tuesBtn.setOnClickListener(v -> showMsg("You cannot add a meal to the weekly plan. Log in first so you can add meals to the weekly plans"));
+        wedBun.setOnClickListener(v -> showMsg("You cannot add a meal to the weekly plan. Log in first so you can add meals to the weekly plans"));
+        thursBtn.setOnClickListener(v -> showMsg("You cannot add a meal to the weekly plan. Log in first so you can add meals to the weekly plans"));
+        friBtn.setOnClickListener(v -> showMsg("You cannot add a meal to the weekly plan. Log in first so you can add meals to the weekly plans"));
     }
 
     private void initViews(View view) {
@@ -144,19 +161,6 @@ public class CalenderFragment extends Fragment implements CalenderView {
         Bundle args = new Bundle();
         args.putString("day", day);
         navController.navigate(R.id.action_calenderFragment_to_bottomSheetFragment, args);
-
-
-
-       /* Bundle args = new Bundle();
-        args.putString("day", day);
-        NavOptions navOptions = new NavOptions.Builder().setLaunchSingleTop(true).build();
-        NavController navController = Navigation.findNavController(view);
-        navController.navigate(R.id.bottomSheetFragment, args, navOptions);*/
-
-        //BottomSheetFragment bottomSheetFragment = new BottomSheetFragment();
-        //bottomSheetFragment.show(requireActivity().getSupportFragmentManager(), bottomSheetFragment.getTag());
-       /* NavController navController=Navigation.findNavController(requireActivity(),R.id.nav_host_fragment);
-        navController.navigate(R.id.bottomSheetFragment);*/
     };
 
     private CalenderAdapter.OnCancelClickListener createOnCancelClickListener() {

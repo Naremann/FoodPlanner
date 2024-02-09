@@ -105,6 +105,17 @@
                 android:textColor="@color/blue"
                 android:layout_marginBottom="20dp"
                 />
+            <TextView
+                android:id="@+id/guest_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/as_a_guest"
+                android:layout_gravity="center"
+                android:layout_marginEnd="10dp"
+                android:textStyle="italic"
+                android:textSize="20sp"
+                android:textColor="@color/orange"
+                />
         </LinearLayout>
     </ScrollView>
 

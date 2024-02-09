@@ -110,6 +110,6 @@ public class FavoriteMealsFragment extends Fragment implements FavoriteView{
     }
 
     private void showErrorMsg(String error){
-        AlertMessage.showToastMessage(error,this.requireContext());
+        AlertMessage.showToastMessage(error,requireContext());
     }
 }

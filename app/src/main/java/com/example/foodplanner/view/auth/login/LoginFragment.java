@@ -36,7 +36,7 @@ public class LoginFragment extends Fragment implements LoginView {
 
     Button signInBtn;
     EditText email, password;
-    TextView haveAccountText;
+    TextView haveAccountText,guestTv;
     LoginPresenter loginPresenter;
     ProgressDialog progressDialog;
     TextInputLayout inputLayoutEmail,inputLayoutPass;
@@ -60,6 +60,14 @@ public class LoginFragment extends Fragment implements LoginView {
     }
 
     private void initViews(View view) {
+        guestTv=view.findViewById(R.id.guest_tv);
+        guestTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferencesManager.saveUserEmail(requireContext(),Constants.GUEST);
+                startHomeActivity();
+            }
+        });
         inputLayoutEmail =view.findViewById(R.id.email_input_layout);
         inputLayoutPass=view.findViewById(R.id.pass_input_layout);
         progressDialog = new ProgressDialog(this.getContext());

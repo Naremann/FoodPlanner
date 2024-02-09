@@ -23,7 +23,7 @@ public interface MealDetailsPresenter {
 
 
     class MealDetailsPresenterImp implements MealDetailsPresenter {
-        private CompositeDisposable compositeDisposable;
+        private final CompositeDisposable compositeDisposable;
         MealRepo mealRepo;
         MealDetailsView mealDetailsView;
 
