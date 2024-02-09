@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.foodplanner.GlideImage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
-
 import java.util.List;
 
 public class FavMealAdapter extends RecyclerView.Adapter<FavMealAdapter.ViewHolder> {

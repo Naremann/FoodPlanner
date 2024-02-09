@@ -1,25 +1,15 @@
 package com.example.foodplanner.model.repo;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import com.example.foodplanner.api.CategoryCallback;
 import com.example.foodplanner.api.MealCallBack;
-import com.example.foodplanner.model.dto.CategoryResponse;
+import com.example.foodplanner.model.dto.Country;
 import com.example.foodplanner.model.dto.Ingredient;
-import com.example.foodplanner.model.dto.IngredientResponse;
-import com.example.foodplanner.model.dto.MealResponse;
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSource;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
@@ -39,57 +29,6 @@ public class MealRepoImp implements MealRepo{
     @Override
     public void getRandomMeal(MealCallBack mealCallBack) {
         randomMealRemoteDataSource.getMeal(mealCallBack);
-    }
-
-    @Override
-    public Completable addMealToFavorite(MealsItem mealsItem) {
-        return mealLocalDataSource.insertProductToFavorite(mealsItem);
-    }
-
-    @Override
-    public Flowable getFavMeals() {
-        return mealLocalDataSource.getFavMeals();
-    }
-
-    @Override
-    public Flowable getPlannedMealsByDate(String date) {
-        return mealLocalDataSource.getPlannedMealByDate(date);
-    }
-
-    @Override
-    public Completable deleteMealFromFav(MealsItem mealItem) {
-        return mealLocalDataSource.deleteFavoriteProduct(mealItem);
-    }
-
-    @Override
-    public Completable addMealToWeeklyPlay(MealsItem mealsItem) {
-        return mealLocalDataSource.addMealToWeekPlan(mealsItem);
-    }
-
-    @Override
-    public void addMealToFav(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
-        mealRemoteDataSource.addMealToPlan(mealsItem,onSuccessListener,onFailureListener);
-    }
-
-    @Override
-    public void addMealToWeeklyPlay(MealsItem mealsItem, String email, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
-        mealRemoteDataSource.addMealToPlan(mealsItem,onSuccessListener,onFailureListener);
-    }
-
-    @Override
-    public Observable<List<MealsItem>> getWeeklyPlannedMealsObservable(String date) {
-        return mealRemoteDataSource.getWeeklyPlannedMealsObservable(date)
-                .doOnSubscribe(disposable -> Log.d("TAG", "Subscribed to Firestore Observable"))
-                .doOnNext(meals -> Log.d("TAG", "Received data from Firestore: " + meals.size() + " items"))
-                .doOnError(error -> Log.e("TAG", "Error fetching data from Firestore", error))
-                .switchIfEmpty(Observable.defer(() -> {
-                    List<MealsItem> localMeals = mealLocalDataSource.getPlannedMealByDate(date).blockingFirst();
-                    if (localMeals.isEmpty()) {
-                        return Observable.empty();
-                    } else {
-                        return Observable.fromArray(localMeals);
-                    }
-                }));
     }
 
     @Override
@@ -136,6 +75,21 @@ public class MealRepoImp implements MealRepo{
     @Override
     public Observable<Object> getMealById(String mealId) {
         return mealRemoteDataSource.getMealById(mealId);
+    }
+
+    @Override
+    public Observable<List<Country>> getCountries() {
+        return mealRemoteDataSource.getCountries();
+    }
+
+    @Override
+    public Observable<List<MealsItem>> getMealsByCountry(String country) {
+        return mealRemoteDataSource.getMealsByCountry(country);
+    }
+
+    @Override
+    public Observable<List<MealsItem>> searchMeals(String name) {
+        return mealRemoteDataSource.searchMeals(name);
     }
 
     @Override

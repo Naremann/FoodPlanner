@@ -5,6 +5,11 @@ import com.example.foodplanner.api.CategoryCallback;
 import com.example.foodplanner.api.WebService;
 import com.example.foodplanner.model.dto.CategoryResponse;
 
+import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -17,24 +22,9 @@ public class CategoryRemoteDataSourceImp implements CategoryRemoteDataSource{
     }
 
     @Override
-    public CategoryResponse.CategoriesItem getCategories(CategoryCallback categoryCallback) {
-        webService.getCategories().enqueue(new Callback<CategoryResponse>() {
-            @Override
-            public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
-                if(response.isSuccessful()){
-                    assert response.body() != null;
-                    categoryCallback.onSuccess(response.body().getCategories());
-                }
-                else{
-                    categoryCallback.onCategoryFailure("Something went error");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<CategoryResponse> call, Throwable t) {
-                categoryCallback.onCategoryFailure(t.getLocalizedMessage());
-            }
-        });
-        return null;
+    public Observable<List<CategoryResponse.CategoriesItem>> getCategories() {
+        return webService.getCategories().map(CategoryResponse::getCategories)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }

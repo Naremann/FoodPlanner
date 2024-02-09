@@ -11,14 +11,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.example.foodplanner.R;
 import com.example.foodplanner.api.ApiManager;
 import com.example.foodplanner.api.WebService;
 import com.example.foodplanner.db.FirebaseUtils;
+import com.example.foodplanner.model.dto.Country;
 import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.IngredientResponse;
 import com.example.foodplanner.model.dto.MealResponse;
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -50,6 +51,8 @@ public interface MealRemoteDataSource {
 
      Observable<List<Ingredient>> getIngredients();
      Observable<List<MealsItem>> getMealsByIngredient(String ingredient);
+     Observable<List<Country>>getCountries();
+     Observable<List<MealsItem>> getMealsByCountry(String country);
 
 
     class MealRemoteDataSourceImp implements MealRemoteDataSource {
@@ -99,9 +102,9 @@ public interface MealRemoteDataSource {
 
         @Override
         public @NonNull Observable<Object> getMealById(String mealId) {
-            return Observable.create(emitter -> webService.getMealById(mealId).enqueue(new Callback<RandomMealResponse>() {
+            return Observable.create(emitter -> webService.getMealById(mealId).enqueue(new Callback<MealResponse>() {
                 @Override
-                public void onResponse(Call<RandomMealResponse> call, Response<RandomMealResponse> response) {
+                public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         emitter.onNext(response.body().getMeals().get(0));
                         emitter.onComplete();
@@ -111,7 +114,7 @@ public interface MealRemoteDataSource {
                 }
 
                 @Override
-                public void onFailure(Call<RandomMealResponse> call, Throwable t) {
+                public void onFailure(Call<MealResponse> call, Throwable t) {
                     emitter.onError(t);
                 }
             })).subscribeOn(Schedulers.io());
@@ -205,8 +208,90 @@ public interface MealRemoteDataSource {
                     ;
         }
 
+        @Override
+        public Observable<List<Country>> getCountries() {
+            return webService.getCountries()
+                    .map(response -> {
+                        List<Country> countryList = new ArrayList<>();
+                        for (MealsItem meal : response.getMeals()) {
+                            String countryName = meal.getStrArea();
+                            int imageResourceId = getResourceIdForCountry(countryName); // Implement this method
+                            countryList.add(new Country(countryName, imageResourceId));
+                        }
+                        return countryList;
+                    });
+
     }
 
-}
+        @Override
+        public Observable<List<MealsItem>> getMealsByCountry(String country) {
+            return webService.getMealsByCountry(country).map(MealResponse::getMeals);
+        }
+
+        private int getResourceIdForCountry(String countryName) {
+            switch (countryName) {
+                case "American":
+                    return R.drawable.us;
+                case "British":
+                    return R.drawable.gb_eng;
+                case "Canadian":
+                    return R.drawable.ca;
+                case "Chinese":
+                    return R.drawable.cn;
+                case "Croatian":
+                    return R.drawable.hr;
+                case "Dutch":
+                    return R.drawable.nl;
+                case "Egyptian":
+                    return R.drawable.eg;
+                case "Filipino":
+                    return R.drawable.ph;
+                case "French":
+                    return R.drawable.fr;
+                case "Greek":
+                    return R.drawable.gr;
+                case "Indian":
+                    return R.drawable.in;
+                case "Irish":
+                    return R.drawable.ie;
+                case "Italian":
+                    return R.drawable.it;
+                case "Jamaican":
+                    return R.drawable.jm;
+                case "Japanese":
+                    return R.drawable.jp;
+                case "Kenyan":
+                    return R.drawable.ke;
+                case "Malaysian":
+                    return R.drawable.my;
+                case "Mexican":
+                    return R.drawable.mx;
+                case "Moroccan":
+                    return R.drawable.ma;
+                case "Polish":
+                    return R.drawable.pl;
+                case "Portuguese":
+                    return R.drawable.pt;
+                case "Russian":
+                    return R.drawable.ru;
+                case "Spanish":
+                    return com.example.foodplanner.R.drawable.es;
+                case "Thai":
+                    return R.drawable.th;
+                case "Tunisian":
+                    return R.drawable.tn;
+                case "Turkish":
+                    return R.drawable.tr;
+                case "Unknown":
+                    return R.drawable.flag_black_24dp;
+                case "Vietnamese":
+                    return R.drawable.vn;
+                default:
+                    return R.drawable.flag_black_24dp;
+            }
+        }
+        }
+
+    }
 
 

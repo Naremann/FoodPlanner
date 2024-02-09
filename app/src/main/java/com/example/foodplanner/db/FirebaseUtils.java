@@ -3,7 +3,6 @@ package com.example.foodplanner.db;
 import android.content.Context;
 
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

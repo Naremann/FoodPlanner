@@ -1,8 +1,5 @@
 package com.example.foodplanner.view.calender;
-
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
-
 import java.util.List;
 
 public interface CalenderView {

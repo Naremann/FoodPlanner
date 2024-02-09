@@ -1,7 +1,5 @@
 package com.example.foodplanner.presenter;
-
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepo;
 import com.example.foodplanner.view.calender.CalenderView;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;

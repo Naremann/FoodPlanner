@@ -4,13 +4,12 @@ import com.example.foodplanner.api.CategoryCallback;
 import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.model.dto.CategoryResponse;
 import com.example.foodplanner.model.dto.MealsItem;
-import com.example.foodplanner.model.dto.RandomMealResponse;
 import com.example.foodplanner.model.repo.MealRepo;
 import com.example.foodplanner.model.repo.remote.CategoryRepo;
 import com.example.foodplanner.view.home.HomeView;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -21,13 +20,15 @@ public interface HomePresenter {
      void getIngredients();
      void getMealsByIngredient(String ingredient);
     void getMealByCategory(String category);
+    void getCountries();
+    void getMealsByCountry(String country);
 
 
-    public class HomePresenterImp implements HomePresenter, MealCallBack, CategoryCallback {
+     class HomePresenterImp implements HomePresenter, MealCallBack {
         HomeView homeView;
         MealRepo mealRepo;
         CategoryRepo categoryRepo;
-        private CompositeDisposable compositeDisposable;
+        private final CompositeDisposable compositeDisposable;
 
 
         public HomePresenterImp(HomeView homeView, MealRepo mealRepo,CategoryRepo categoryRepo) {
@@ -44,7 +45,10 @@ public interface HomePresenter {
 
         @Override
         public void getCategories() {
-            categoryRepo.getCategories(this);
+            compositeDisposable.add(categoryRepo.getCategories().subscribeOn(Schedulers.io())
+                    .subscribeOn(AndroidSchedulers.mainThread()).
+                    subscribe(categoriesItems ->  homeView.showCategorySuccessMessage(categoriesItems),
+                            error->homeView.showCategoryErrorMessage(error.getLocalizedMessage())));
         }
 
         @Override
@@ -73,19 +77,26 @@ public interface HomePresenter {
                                     error->homeView.onMealByCategoryFail(error.getLocalizedMessage())));
         }
 
-        @Override
+         @Override
+         public void getCountries() {
+            compositeDisposable.add(mealRepo.getCountries().subscribeOn(
+                    Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+                            countries -> homeView.showCountriesSuccessMessage(countries),
+                    error->homeView.showCountriesErrorMessage(error.getLocalizedMessage())
+            ));
+
+         }
+
+         @Override
+         public void getMealsByCountry(String country) {
+             compositeDisposable.add(mealRepo.getMealsByCountry(country)
+                     .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                     .subscribe(mealsItems -> homeView.showMealsByCountrySuccess(mealsItems),errpr->homeView.showMealsByCountryError(errpr.getLocalizedMessage())));
+         }
+
+         @Override
         public void onSuccess(MealsItem mealsItem) {
             homeView.showSuccessMessage(mealsItem);
-        }
-
-        @Override
-        public void onSuccess(List<CategoryResponse.CategoriesItem> categoriesItems) {
-            homeView.showCategorySuccessMessage(categoriesItems);
-        }
-
-        @Override
-        public void onCategoryFailure(String error) {
-            homeView.showCategoryErrorMessage(error);
         }
 
         @Override

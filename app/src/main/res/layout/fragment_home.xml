@@ -129,6 +129,40 @@ mmmmmmmmmmmmmmmmmm"
            />
 
 
+       <ProgressBar
+           android:id="@+id/country_progress_bar"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:layout_constraintTop_toTopOf="@id/category_recycler_view"
+           app:layout_constraintBottom_toBottomOf="@id/category_recycler_view"
+           app:layout_constraintStart_toStartOf="@id/category_recycler_view"
+           app:layout_constraintEnd_toEndOf="@id/category_recycler_view"
+           />
+       <TextView
+           android:id="@+id/countery_tv"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:layout_constraintTop_toBottomOf="@id/ingredients_recycler_view"
+           app:layout_constraintStart_toStartOf="parent"
+           android:text="@string/countries"
+           android:layout_marginTop="25dp"
+           android:textColor="@color/orange"
+           android:textSize="25sp"
+           android:textStyle="bold"
+           />
+       <androidx.recyclerview.widget.RecyclerView
+           android:id="@+id/countries_recycler_view"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           app:layout_constraintTop_toBottomOf="@id/countery_tv"
+           android:layout_marginTop="5dp"
+           android:orientation="horizontal"
+           app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+           app:spanCount="4"
+           tools:listitem="@layout/category_item"
+           />
+
+
    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
