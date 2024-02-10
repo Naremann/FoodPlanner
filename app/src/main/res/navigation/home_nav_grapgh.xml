@@ -33,7 +33,7 @@
     <fragment
         android:id="@+id/categoryMealFragment"
         android:name="com.example.foodplanner.view.meal_by_category.MealFragment"
-        android:label="Category Meal"
+        android:label="Meals"
         tools:layout="@layout/fragment_category_meal">
         <action
             android:id="@+id/action_categoryMealFragment_to_mealDetailsFragment"
@@ -55,8 +55,8 @@
     <fragment
         android:id="@+id/searchFragment2"
         android:name="com.example.foodplanner.view.serach_meal.SearchMealFragment"
-        android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
+        android:label="Search For Meals"
+        tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_searchFragment2_to_categoryMealFragment"
             app:destination="@id/categoryMealFragment" />
