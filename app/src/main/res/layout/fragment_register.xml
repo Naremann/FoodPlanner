@@ -37,6 +37,7 @@
         android:paddingHorizontal="20dp"
         android:background="@drawable/border_bg"
         android:layout_marginHorizontal="20dp"
+        android:paddingBottom="20dp"
         android:orientation="vertical"
         >
         <LinearLayout
@@ -112,6 +113,21 @@
                 android:textColor="@color/blue"
                 android:layout_marginBottom="20dp"
                 />
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/orange"
+                >
+                <ImageView
+                    android:id="@+id/google_img"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/google"
+                    android:layout_margin="5dp"
+                    />
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
 

@@ -1,5 +1,8 @@
 package com.example.foodplanner.model.repo;
 
+import android.app.Activity;
+import android.content.Intent;
+
 import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.model.dto.Country;
 import com.example.foodplanner.model.dto.Ingredient;
@@ -7,6 +10,8 @@ import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSource;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +95,16 @@ public class MealRepoImp implements MealRepo{
     @Override
     public Observable<List<MealsItem>> searchMeals(String name) {
         return mealRemoteDataSource.searchMeals(name);
+    }
+
+    @Override
+    public Observable<FirebaseUser> signInWithGoogle(Activity activity) {
+        return mealRemoteDataSource.signInWithGoogle(activity);
+    }
+
+    @Override
+    public Observable<AuthResult> signUpWithGoogle(String idToken) {
+        return mealRemoteDataSource.signUpWithGoogle(idToken);
     }
 
     @Override

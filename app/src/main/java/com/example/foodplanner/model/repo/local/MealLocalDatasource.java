@@ -52,7 +52,8 @@ public interface MealLocalDatasource {
 
         @Override
         public Completable addMealToWeekPlan(MealsItem mealsItem) {
-            mealsItem.setFavorite(false);
+         //   mealsItem.setFavorite(false);
+            mealsItem.setPlanned(true);
             return mealDao.addMealToPlan(mealsItem).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());
         }

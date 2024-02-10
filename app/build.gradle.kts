@@ -40,6 +40,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.firebase:firebase-auth:22.3.1")
     implementation("com.google.firebase:firebase-firestore:24.10.1")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
+    implementation ("com.google.android.gms:play-services-identity:+")
     //retrofit
     implementation("com.google.code.gson:gson:2.6.2")
     implementation("com.squareup.retrofit2:retrofit:2.3.0")

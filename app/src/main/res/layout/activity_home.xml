@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.activity.HomeActivity"
+    android:background="@color/light_orange"
     >
     <com.google.android.material.internal.BaselineLayout
         android:id="@+id/baseline"

@@ -37,4 +37,12 @@ public class HomeActivity extends AppCompatActivity{
         return navController.navigateUp() || super.onSupportNavigateUp();
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finishAffinity();
+        System.exit(0);
+
+    }
 }

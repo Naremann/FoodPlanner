@@ -24,6 +24,7 @@ import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.presenter.CalenderPresenter;
 import com.example.foodplanner.view.AlertMessage;
+import com.example.foodplanner.view.fav_meal.FavoriteMealsFragmentDirections;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,6 +125,15 @@ public class CalenderFragment extends Fragment implements CalenderView {
         adapterThu.onCancelClickListener = createOnCancelClickListener();
         adapterFri.onCancelClickListener = createOnCancelClickListener();
 
+        adapterSat.onItemClickListener=createOnItemClickListener();
+        adapterSun.onItemClickListener=createOnItemClickListener();
+        adapterMon.onItemClickListener=createOnItemClickListener();
+        adapterTue.onItemClickListener=createOnItemClickListener();
+        adapterWed.onItemClickListener=createOnItemClickListener();
+        adapterThu.onItemClickListener=createOnItemClickListener();
+        adapterFri.onItemClickListener=createOnItemClickListener();
+
+
         recyclerViewSat.setAdapter(adapterSat);
         recyclerViewSun.setAdapter(adapterSun);
         recyclerViewMon.setAdapter(adapterMon);
@@ -173,6 +183,10 @@ public class CalenderFragment extends Fragment implements CalenderView {
         };
     }
 
+    private CalenderAdapter.OnItemClickListener createOnItemClickListener(){
+        return this::navigateToMealDetailsFragment;
+    }
+
     @Override
     public void onGetAllPlannedMeals(List<MealsItem> plannedMeals, String date) {
 
@@ -207,6 +221,12 @@ public class CalenderFragment extends Fragment implements CalenderView {
                 adapterFri.changeData(filteredMeals);
                 break;
     }
+    }
+
+    private void navigateToMealDetailsFragment(MealsItem mealsItems) {
+        CalenderFragmentDirections.ActionCalenderFragmentToMealDetailsFragment action=CalenderFragmentDirections
+                .actionCalenderFragmentToMealDetailsFragment(mealsItems) ;
+        Navigation.findNavController(requireView()).navigate(action);
 
     }
 

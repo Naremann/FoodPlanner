@@ -9,7 +9,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintWidth_percent=".4"
-        app:layout_constraintHeight_percent=".25"
+        app:layout_constraintHeight_percent=".29"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,21 +31,21 @@
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/register_tv"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHeight_percent=".01"
-        android:orientation="horizontal"
+        android:orientation="vertical"
+        app:layout_constraintHeight_percent=".04"
         />
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/baseline2"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHeight_percent=".6"
-        android:layout_marginVertical="10dp"
+        android:layout_marginBottom="10dp"
         android:paddingHorizontal="20dp"
         android:orientation="vertical"
         android:background="@drawable/border_bg"
         android:layout_marginHorizontal="20dp"
         android:paddingTop="20dp"
+        android:paddingBottom="20dp"
         >
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,7 +93,6 @@
                 android:textColor="@color/white"
                 android:backgroundTint="@color/orange"
                 app:boxStrokeColor="@color/orange"
-
                 />
             <TextView
                 android:id="@+id/have_account_tv"
@@ -103,19 +102,38 @@
                 android:gravity="center_horizontal"
                 android:layout_marginTop="2dp"
                 android:textColor="@color/blue"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="10dp"
                 />
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/orange"
+                android:layout_marginTop="8dp"
+
+                >
+                <ImageView
+                    android:id="@+id/google_img"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/google"
+                   android:layout_margin="5dp"
+                    />
+
+            </com.google.android.material.card.MaterialCardView>
             <TextView
                 android:id="@+id/guest_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/as_a_guest"
                 android:layout_gravity="center"
-                android:layout_marginEnd="10dp"
                 android:textStyle="italic"
                 android:textSize="20sp"
                 android:textColor="@color/orange"
+                android:layout_marginTop="5dp"
                 />
+
         </LinearLayout>
     </ScrollView>
 
