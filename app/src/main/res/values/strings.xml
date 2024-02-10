@@ -33,4 +33,7 @@
     <string name="countries">Countries</string>
     <string name="search_for_meals">Search for meals</string>
     <string name="as_a_guest">As a guest</string>
+    <string name="or">Or</string>
+    <string name="default_web_client_id">809707842387-kkbjo8ekg1d3pgsbbkbse2bb25f025ia.apps.googleusercontent.com</string>
+    <string name="steps">Steps:</string>
 </resources>

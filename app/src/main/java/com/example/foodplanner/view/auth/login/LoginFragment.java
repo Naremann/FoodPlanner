@@ -19,10 +19,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.foodplanner.Constants;
+import com.example.foodplanner.db.FirebaseUtils;
 import com.example.foodplanner.db.SharedPreferencesManager;
+import com.example.foodplanner.model.repo.MealRepoImp;
+import com.example.foodplanner.model.repo.local.MealLocalDatasource;
+import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
+import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSourceImp;
 import com.example.foodplanner.view.AlertMessage;
 import com.example.foodplanner.R;
 import com.example.foodplanner.presenter.login.LoginPresenter;
@@ -30,16 +36,24 @@ import com.example.foodplanner.presenter.login.LoginPresenterImp;
 import com.example.foodplanner.view.FragmentNavigator;
 import com.example.foodplanner.view.activity.HomeActivity;
 import com.example.foodplanner.view.auth.register.RegisterFragment;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Objects;
 
 public class LoginFragment extends Fragment implements LoginView {
 
     Button signInBtn;
     EditText email, password;
+    ImageView googleImg;
     TextView haveAccountText,guestTv;
     LoginPresenter loginPresenter;
     ProgressDialog progressDialog;
     TextInputLayout inputLayoutEmail,inputLayoutPass;
+    private GoogleSignInClient googleSignInClient;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -54,19 +68,49 @@ public class LoginFragment extends Fragment implements LoginView {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loginPresenter = new LoginPresenterImp(this);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
+        loginPresenter = new LoginPresenterImp(this,new MealRepoImp(new RandomMealRemoteDataSourceImp(),
+                new MealLocalDatasource.MealLocalDataSourceImp(requireContext()),
+                new MealRemoteDataSource.MealRemoteDataSourceImp(requireContext())));
         initViews(view);
 
     }
 
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FirebaseUtils.RC_SIGN_IN) {
+            loginPresenter.handleGoogleSignInResult(data);
+        }
+    }
+
+    private void signInWithGoogle() {
+        loginPresenter.signInWithGoogle(requireActivity());
+    }
+
+    private void startGoogleSignInActivity() {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, FirebaseUtils.RC_SIGN_IN);
+    }
+
     private void initViews(View view) {
+        googleImg=view.findViewById(R.id.google_img);
+        googleImg.setOnClickListener(v -> {
+           // showProgressDialog();
+            signInWithGoogle();
+            //startGoogleSignInActivity();
+        });
         guestTv=view.findViewById(R.id.guest_tv);
-        guestTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferencesManager.saveUserEmail(requireContext(),Constants.GUEST);
-                startHomeActivity();
-            }
+        guestTv.setOnClickListener(v -> {
+            SharedPreferencesManager.saveUserEmail(requireContext(),Constants.GUEST);
+            startHomeActivity();
         });
         inputLayoutEmail =view.findViewById(R.id.email_input_layout);
         inputLayoutPass=view.findViewById(R.id.pass_input_layout);
@@ -105,11 +149,6 @@ public class LoginFragment extends Fragment implements LoginView {
         loginPresenter.signInWithFirebaseAuth(email.getText().toString(), password.getText().toString());
         String emailText = email.getText().toString();
         SharedPreferencesManager.saveUserEmail(requireContext(),emailText);
-        /*SharedPreferences sharedPreferences = this.requireContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("email", emailText);
-        editor.apply();*/
-
     }
 
     @Override
@@ -131,6 +170,21 @@ public class LoginFragment extends Fragment implements LoginView {
         AlertMessage.showToastMessage(error, this.getContext());
         hideProgressDialog();
     }
+
+    @Override
+    public void showSuccessGoogleAuthMessage(FirebaseUser user) {
+        AlertMessage.showToastMessage("Sign in Successfully", this.getContext());
+        hideProgressDialog();
+        startHomeActivity();
+    }
+
+
+    @Override
+    public void showFailGoogleAuthMessage(String localizedMessage) {
+        AlertMessage.showToastMessage(localizedMessage, this.getContext());
+        hideProgressDialog();
+    }
+
     boolean validateFields(){
         boolean isValid=true;
         if(email.getText().toString().isEmpty()){

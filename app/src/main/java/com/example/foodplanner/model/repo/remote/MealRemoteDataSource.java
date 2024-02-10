@@ -1,6 +1,8 @@
 package com.example.foodplanner.model.repo.remote;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -20,13 +22,23 @@ import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.IngredientResponse;
 import com.example.foodplanner.model.dto.MealResponse;
 import com.example.foodplanner.model.dto.MealsItem;
+import com.google.android.gms.auth.api.identity.Identity;
+import com.google.android.gms.auth.api.identity.SignInCredential;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public interface MealRemoteDataSource {
     @NonNull Observable<List<MealsItem>> getMealByCategory(String category);
@@ -42,28 +54,33 @@ public interface MealRemoteDataSource {
                       OnFailureListener onFailureListener);
 
     Observable<List<MealsItem>> getWeeklyPlannedMealsObservable(String date);
+
     void deleteFavoriteMealFromFireStore(MealsItem mealsItem,
                                          OnSuccessListener<Void> onSuccessListener,
                                          OnFailureListener onFailureListener);
 
-     void deletePlannedMealFireStore(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
-     Observable<List<MealsItem>> searchMeals(String name);
+    void deletePlannedMealFireStore(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener);
 
-     Observable<List<Ingredient>> getIngredients();
-     Observable<List<MealsItem>> getMealsByIngredient(String ingredient);
-     Observable<List<Country>>getCountries();
-     Observable<List<MealsItem>> getMealsByCountry(String country);
+    Observable<List<MealsItem>> searchMeals(String name);
+
+    Observable<List<Ingredient>> getIngredients();
+
+    Observable<List<MealsItem>> getMealsByIngredient(String ingredient);
+
+    Observable<List<Country>> getCountries();
+
+    Observable<List<MealsItem>> getMealsByCountry(String country);
+    Observable<FirebaseUser> signInWithGoogle(Activity activity);
+    Observable<AuthResult> signUpWithGoogle(String idToken);
 
 
     class MealRemoteDataSourceImp implements MealRemoteDataSource {
         WebService webService;
         Context context;
-       // String savedEmail;
 
         public MealRemoteDataSourceImp(Context context) {
             this.webService = ApiManager.getApi();
             this.context = context;
-           // this.savedEmail=SharedPreferencesManager.getUserEmail(context);
         }
 
         @Override
@@ -78,26 +95,6 @@ public interface MealRemoteDataSource {
                         }
                         return meals;
                     });
-            /*return webService.getAllMealsByCategory(category)
-                    .map(MealResponse::getMeals)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());*/
-            /*return Observable.create(emitter -> webService.getAllMealsByCategory(category).enqueue(new Callback<MealResponse>() {
-                @Override
-                public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        emitter.onNext(response.body().getMeals());
-                        emitter.onComplete();
-                    } else {
-                        emitter.onError(new Throwable("Failed to get meals by category"));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<MealResponse> call, Throwable t) {
-                    emitter.onError(t);
-                }
-            })).subscribeOn(Schedulers.io());*/
         }
 
         @Override
@@ -134,27 +131,27 @@ public interface MealRemoteDataSource {
         @Override
         public Observable<List<MealsItem>> getFavMealsFromFireStore() {
             return Observable.<List<MealsItem>>create(emitter -> FirebaseUtils.getFavMeals(context, task -> {
-                if(task.isSuccessful()){
-                    QuerySnapshot  querySnapshot= (QuerySnapshot) task.getResult();
-                    if(querySnapshot!=null){
-                        List<MealsItem> mealsItems=new ArrayList<>();
-                        for (DocumentSnapshot documentSnapshot:querySnapshot.getDocuments()){
-                            MealsItem mealsItem=documentSnapshot.toObject(MealsItem.class);
-                            if(mealsItem!=null){
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = (QuerySnapshot) task.getResult();
+                    if (querySnapshot != null) {
+                        List<MealsItem> mealsItems = new ArrayList<>();
+                        for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
+                            MealsItem mealsItem = documentSnapshot.toObject(MealsItem.class);
+                            if (mealsItem != null) {
                                 mealsItems.add(mealsItem);
                             }
                         }
                         emitter.onNext(mealsItems);
                         emitter.onComplete();
-                    }else {
+                    } else {
                         emitter.onError(new Exception("QuerySnapshot is null"));
                     }
-                }
-                else {
+                } else {
                     emitter.onError(task.getException());
                 }
             })).subscribeOn(Schedulers.io());
         }
+
         @Override
         public Observable<List<MealsItem>> getWeeklyPlannedMealsObservable(String date) {
             return Observable.create((ObservableOnSubscribe<List<MealsItem>>) emitter -> FirebaseUtils.getWeeklyPlannedMeals(context, date, task -> {
@@ -178,6 +175,7 @@ public interface MealRemoteDataSource {
                 }
             }, e -> emitter.onError(e.fillInStackTrace()))).subscribeOn(Schedulers.io());
         }
+
         @Override
         public void deleteFavoriteMealFromFireStore(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
             FirebaseUtils.deleteFavMeal(context, mealsItem.getIdMeal(), onSuccessListener, onFailureListener);
@@ -185,7 +183,7 @@ public interface MealRemoteDataSource {
 
         @Override
         public void deletePlannedMealFireStore(MealsItem mealsItem, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
-            FirebaseUtils.deletePlannedMeal(context,mealsItem.getIdMeal(),onSuccessListener,onFailureListener);
+            FirebaseUtils.deletePlannedMeal(context, mealsItem.getIdMeal(), onSuccessListener, onFailureListener);
         }
 
         @Override
@@ -221,12 +219,60 @@ public interface MealRemoteDataSource {
                         return countryList;
                     });
 
-    }
+        }
 
         @Override
         public Observable<List<MealsItem>> getMealsByCountry(String country) {
             return webService.getMealsByCountry(country).map(MealResponse::getMeals);
         }
+
+        @Override
+        public Observable<FirebaseUser> signInWithGoogle(Activity activity) {
+            return Observable.create(emitter -> {
+                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(activity.getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .build();
+
+                GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(activity, gso);
+                Intent signInIntent = googleSignInClient.getSignInIntent();
+                activity.startActivityForResult(signInIntent, FirebaseUtils.RC_SIGN_IN);
+            });
+            /*return Observable.create(emitter -> {
+                SignInCredential googleCredential = Identity.getSignInClient(context).
+                        getSignInCredentialFromIntent(data);
+                String idToken = googleCredential.getGoogleIdToken();
+                if (idToken != null) {
+                    AuthCredential firebaseCredential = GoogleAuthProvider.getCredential(idToken, null);
+                    FirebaseUtils.getFirebaseInstance().signInWithCredential(firebaseCredential)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    emitter.onNext(Objects.requireNonNull(FirebaseUtils.getFirebaseInstance().getCurrentUser()).getDisplayName());
+                                    emitter.onComplete();
+                                } else {
+                                    emitter.onError(task.getException());
+                                }
+                            });
+                } else {
+                    emitter.onError(new Exception("Failed to retrieve Google ID token"));
+                }
+            }).subscribeOn(Schedulers.io());*/
+        }
+
+        @Override
+        public Observable<AuthResult> signUpWithGoogle(String idToken) {
+            AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+            return Observable.create(emitter -> FirebaseUtils.getFirebaseInstance().signInWithCredential(credential)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            emitter.onNext(task.getResult());
+                        } else {
+                            emitter.onError(task.getException());
+                        }
+                        emitter.onComplete();
+                    }));
+        }
+
 
         private int getResourceIdForCountry(String countryName) {
             switch (countryName) {

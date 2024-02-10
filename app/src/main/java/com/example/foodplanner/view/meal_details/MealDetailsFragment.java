@@ -38,12 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MealDetailsFragment extends Fragment implements MealDetailsView {
-    TextView mealTitle, mealCategory, mealArea;
+    TextView mealTitle, mealCategory, mealArea,stepsTv;
     ImageView mealImg, fillHeartImg, emptyHeartImg, planImg;
     RecyclerView ingredientRecyclerView;
    MealsItem mealsItem = null;
     IngredientAdapter ingredientAdapter;
-   // List<Ingredient> ingredients;
     WebView webView;
     ProgressBar videoProgressBar;
     MealDetailsPresenter mealDetailsPresenter;
@@ -68,18 +67,20 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
 
         if (getArguments() != null) {
             mealsItem = MealDetailsFragmentArgs.fromBundle(getArguments()).getMeal();
+            if (mealsItem != null) {
+                mealDetailsPresenter.getMealById(mealsItem.getIdMeal());
 
-            mealDetailsPresenter.getMealById(mealsItem.getIdMeal());
-                    isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext(), mealsItem.getIdMeal());
+                isFavorite = SharedPreferencesManager.loadFavoriteStatus(requireContext(), mealsItem.getIdMeal());
                 updateHeartIconVisibility(mealsItem);
-            emptyHeartImg.setOnClickListener(v -> {
-               addMealToFavorite(mealsItem);
-            });
-            fillHeartImg.setOnClickListener(v -> {
-                deleteMealFromFav(mealsItem);
-                
-            });
+                emptyHeartImg.setOnClickListener(v -> {
+                    addMealToFavorite(mealsItem);
+                });
+                fillHeartImg.setOnClickListener(v -> {
+                    deleteMealFromFav(mealsItem);
 
+                });
+
+            }
         }
         checkUser();
 
@@ -127,6 +128,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
         mealCategory = view.findViewById(R.id.category_tv);
         mealImg = view.findViewById(R.id.meal_img);
         webView = view.findViewById(R.id.web_view);
+        stepsTv=view.findViewById(R.id.steps_tc);
         videoProgressBar = view.findViewById(R.id.video_progress_bar);
         ingredientRecyclerView = view.findViewById(R.id.ingredient_recycler_view);
         ingredientAdapter = new IngredientAdapter(new ArrayList<>());
@@ -142,6 +144,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
            mealTitle.setText(mealsItem.getStrMeal());
            mealCategory.setText(mealsItem.getStrCategory());
            mealArea.setText(mealsItem.getStrArea());
+           stepsTv.setText(mealsItem.getStrInstructions());
            GlideImage.downloadImageToImageView(this.getContext(), mealsItem.getStrMealThumb(), mealImg);
            YouTubeVideo.loadVideoUrlInWebView(webView, mealsItem.getStrYoutube(), videoProgressBar);
        }
@@ -159,9 +162,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsView {
             String savedEmail = SharedPreferencesManager.getUserEmail(requireContext());
             mealsItem.setStrCreativeCommonsConfirmed(savedEmail);
             Log.e("TAG", "email: " + savedEmail);
-            //mealDetailsPresenter.i
             mealDetailsPresenter.addMealToWeeklyPlan(mealsItem);
-           // mealDetailsPresenter.addWeeklyPlayMealToFireStore(mealsItem);
             dialog.dismiss();
         };
         sundayButton.setOnClickListener(dayClickListener);

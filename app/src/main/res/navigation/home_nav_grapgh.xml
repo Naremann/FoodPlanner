@@ -76,6 +76,9 @@
             android:name="day"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_calenderFragment_to_mealDetailsFragment"
+            app:destination="@id/mealDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/mealByIngredientFragment"

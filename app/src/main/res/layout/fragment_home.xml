@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.home.HomeFragment"
     android:paddingHorizontal="10dp"
+
     >
    <androidx.constraintlayout.widget.ConstraintLayout
        android:layout_width="match_parent"
@@ -68,6 +69,7 @@ mmmmmmmmmmmmmmmmmm"
            app:layout_constraintBottom_toBottomOf="@id/category_recycler_view"
            app:layout_constraintStart_toStartOf="@id/category_recycler_view"
            app:layout_constraintEnd_toEndOf="@id/category_recycler_view"
+           android:visibility="gone"
            />
        <TextView
            android:id="@+id/category_tv"
@@ -87,9 +89,9 @@ mmmmmmmmmmmmmmmmmm"
            android:layout_height="wrap_content"
            app:layout_constraintTop_toBottomOf="@id/category_tv"
            android:layout_marginTop="5dp"
-           android:orientation="horizontal"
+           android:orientation="vertical"
            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-           app:spanCount="4"
+           app:spanCount="2"
            tools:listitem="@layout/category_item"
            />
 
@@ -122,21 +124,10 @@ mmmmmmmmmmmmmmmmmm"
            android:layout_height="wrap_content"
            app:layout_constraintTop_toBottomOf="@id/ingredient_tv"
            android:layout_marginTop="5dp"
-           android:orientation="horizontal"
+           android:orientation="vertical"
            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-           app:spanCount="4"
+           app:spanCount="2"
            tools:listitem="@layout/category_item"
-           />
-
-
-       <ProgressBar
-           android:id="@+id/country_progress_bar"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           app:layout_constraintTop_toTopOf="@id/category_recycler_view"
-           app:layout_constraintBottom_toBottomOf="@id/category_recycler_view"
-           app:layout_constraintStart_toStartOf="@id/category_recycler_view"
-           app:layout_constraintEnd_toEndOf="@id/category_recycler_view"
            />
        <TextView
            android:id="@+id/countery_tv"
@@ -156,9 +147,9 @@ mmmmmmmmmmmmmmmmmm"
            android:layout_height="wrap_content"
            app:layout_constraintTop_toBottomOf="@id/countery_tv"
            android:layout_marginTop="5dp"
-           android:orientation="horizontal"
+           android:orientation="vertical"
            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-           app:spanCount="4"
+           app:spanCount="2"
            tools:listitem="@layout/category_item"
            />
 

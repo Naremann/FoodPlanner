@@ -18,6 +18,7 @@ public class FirebaseUtils {
     public static String FAV_COLLECTION_NAME="fav";
     public static final String PLAN_MEAL_COLLECTION_NAME ="planMeal";
     public static FirebaseAuth firebaseAuth=getFirebaseInstance();
+    public static final int RC_SIGN_IN = 123;
    static FirebaseUser currentUser = getFirebaseInstance().getCurrentUser();
 
     public static FirebaseAuth getFirebaseInstance(){
@@ -114,6 +115,11 @@ public class FirebaseUtils {
     public static void signIn(String email, String password, OnCompleteListener<AuthResult> onCompleteListener){
         getFirebaseInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(onCompleteListener);
+
+    }
+
+    public static void signInWithGoogle(){
+
 
     }
 

@@ -42,7 +42,7 @@ public class HomeFragment extends Fragment implements HomeView {
     CategoryAdapter categoryAdapter;
     CountryAdapter countryAdapter;
     RecyclerView categoryRecyclerView, ingredRecyclerView,countryRecyclerView;
-    ProgressBar progressBar,ingredientProgressBar;
+    ProgressBar ingredientProgressBar;
     MealsItem mealItem;
     OnMealByCountryClick onMealByCountryClick;
     OnMealByIngredientClick onMealByIngredientClick;
@@ -83,7 +83,6 @@ public class HomeFragment extends Fragment implements HomeView {
         initCountryRecyclerView(view);
         mealImg = view.findViewById(R.id.meal_img);
         mealTitle = view.findViewById(R.id.meal_title_tv);
-        progressBar = view.findViewById(R.id.recycler_progress_bar);
         ingredientProgressBar=view.findViewById(R.id.ingredient_progress_bar);
         cardView = view.findViewById(R.id.meal_card_view);
         cardView.setOnClickListener(v -> navigateToMealDetailsFragment());
@@ -154,13 +153,11 @@ public class HomeFragment extends Fragment implements HomeView {
     @Override
     public void showErrorMessage(String error) {
         AlertMessage.showToastMessage(error, this.getContext());
-        hideProgressBar(progressBar);
     }
 
     @Override
     public void showCategorySuccessMessage(List<CategoryResponse.CategoriesItem> categoriesItems) {
         categoryAdapter.changeData(categoriesItems);
-        hideProgressBar(progressBar);
     }
 
     @Override
@@ -171,6 +168,7 @@ public class HomeFragment extends Fragment implements HomeView {
     @Override
     public void showIngredientSuccessMessage(List<Ingredient> ingredients) {
         ingredientAdapter.changeData(ingredients);
+        hideProgressBar(ingredientProgressBar);
     }
 
     @Override
@@ -181,6 +179,7 @@ public class HomeFragment extends Fragment implements HomeView {
     @Override
     public void showMealsByIngredientSuccess(List<MealsItem> mealsItems) {
         onMealByIngredientClick.onItemClick(mealsItems);
+        hideProgressBar(ingredientProgressBar);
     }
 
     @Override
@@ -213,10 +212,10 @@ public class HomeFragment extends Fragment implements HomeView {
     public void showMealsByCountryError(String localizedMessage) {
         showMessage(localizedMessage);
     }
-
     @Override
     public void showMealsByCountrySuccess(List<MealsItem> mealsItems) {
         onMealByCountryClick.onItemClick(mealsItems);
+
     }
 
     void hideProgressBar(ProgressBar progressBar) {
