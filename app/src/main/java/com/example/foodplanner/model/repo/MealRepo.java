@@ -7,6 +7,7 @@ import com.example.foodplanner.api.MealCallBack;
 import com.example.foodplanner.model.dto.Country;
 import com.example.foodplanner.model.dto.Ingredient;
 import com.example.foodplanner.model.dto.MealsItem;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
@@ -17,6 +18,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public interface MealRepo {
    void getRandomMeal(MealCallBack mealCallBack);
@@ -35,5 +37,6 @@ public interface MealRepo {
     Observable<List<MealsItem>> getMealsByCountry(String country);
     Observable<List<MealsItem>> searchMeals(String name);
     Observable<AuthResult> signUpWithGoogle(String idToken);
-     Observable<FirebaseUser> signInWithGoogle(Activity activity);
+    Single<FirebaseUser> signInWithGoogle(GoogleSignInAccount account);
+ //   Observable<FirebaseUser> signInWithGoogle(Activity activity);
 }

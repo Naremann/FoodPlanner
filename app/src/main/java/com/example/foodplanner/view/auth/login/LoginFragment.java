@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.foodplanner.Constants;
 import com.example.foodplanner.db.FirebaseUtils;
@@ -37,8 +38,11 @@ import com.example.foodplanner.view.FragmentNavigator;
 import com.example.foodplanner.view.activity.HomeActivity;
 import com.example.foodplanner.view.auth.register.RegisterFragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -72,7 +76,6 @@ public class LoginFragment extends Fragment implements LoginView {
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
         loginPresenter = new LoginPresenterImp(this,new MealRepoImp(new RandomMealRemoteDataSourceImp(),
                 new MealLocalDatasource.MealLocalDataSourceImp(requireContext()),
@@ -81,31 +84,35 @@ public class LoginFragment extends Fragment implements LoginView {
 
     }
 
+    private void signIn() {
 
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, FirebaseUtils.RC_SIGN_IN);
+       // SharedPreferencesManager.saveUserEmail(requireContext(),emailText);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == FirebaseUtils.RC_SIGN_IN) {
-            loginPresenter.handleGoogleSignInResult(data);
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                loginPresenter.signInWithGoogle(account);
+                SharedPreferencesManager.saveUserEmail(requireContext(),account.getEmail());
+
+            } catch (ApiException e) {
+                showErrorMessage("Google sign in failed");
+            }
         }
-    }
-
-    private void signInWithGoogle() {
-        loginPresenter.signInWithGoogle(requireActivity());
-    }
-
-    private void startGoogleSignInActivity() {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, FirebaseUtils.RC_SIGN_IN);
     }
 
     private void initViews(View view) {
         googleImg=view.findViewById(R.id.google_img);
         googleImg.setOnClickListener(v -> {
-           // showProgressDialog();
-            signInWithGoogle();
-            //startGoogleSignInActivity();
+            showProgressDialog();
+            signIn();
         });
         guestTv=view.findViewById(R.id.guest_tv);
         guestTv.setOnClickListener(v -> {

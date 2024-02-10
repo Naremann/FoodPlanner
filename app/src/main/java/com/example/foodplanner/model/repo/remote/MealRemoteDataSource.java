@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,6 +26,7 @@ import com.example.foodplanner.model.dto.MealsItem;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -70,7 +72,7 @@ public interface MealRemoteDataSource {
     Observable<List<Country>> getCountries();
 
     Observable<List<MealsItem>> getMealsByCountry(String country);
-    Observable<FirebaseUser> signInWithGoogle(Activity activity);
+    public Single<FirebaseUser> signInWithGoogle(GoogleSignInAccount account);
     Observable<AuthResult> signUpWithGoogle(String idToken);
 
 
@@ -227,8 +229,18 @@ public interface MealRemoteDataSource {
         }
 
         @Override
-        public Observable<FirebaseUser> signInWithGoogle(Activity activity) {
-            return Observable.create(emitter -> {
+        public Single<FirebaseUser> signInWithGoogle(GoogleSignInAccount account) {
+
+            AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+            return Single.create(emitter -> FirebaseUtils.getFirebaseInstance().signInWithCredential(credential)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            emitter.onSuccess(task.getResult().getUser());
+                        } else {
+                            emitter.onError(task.getException());
+                        }
+                    }));
+           /* return Observable.create(emitter -> {
                 GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestIdToken(activity.getString(R.string.default_web_client_id))
                         .requestEmail()
@@ -237,7 +249,7 @@ public interface MealRemoteDataSource {
                 GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(activity, gso);
                 Intent signInIntent = googleSignInClient.getSignInIntent();
                 activity.startActivityForResult(signInIntent, FirebaseUtils.RC_SIGN_IN);
-            });
+            });*/
             /*return Observable.create(emitter -> {
                 SignInCredential googleCredential = Identity.getSignInClient(context).
                         getSignInCredentialFromIntent(data);

@@ -10,14 +10,18 @@ import com.example.foodplanner.model.dto.MealsItem;
 import com.example.foodplanner.model.repo.remote.MealRemoteDataSource;
 import com.example.foodplanner.model.repo.remote.RandomMealRemoteDataSource;
 import com.example.foodplanner.model.repo.local.MealLocalDatasource;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class MealRepoImp implements MealRepo{
     RandomMealRemoteDataSource randomMealRemoteDataSource;
@@ -97,15 +101,27 @@ public class MealRepoImp implements MealRepo{
         return mealRemoteDataSource.searchMeals(name);
     }
 
-    @Override
-    public Observable<FirebaseUser> signInWithGoogle(Activity activity) {
+    /*@Override
+      public Single<FirebaseUser> signInWithGoogle(GoogleSignInAccount account) {
         return mealRemoteDataSource.signInWithGoogle(activity);
-    }
+    }*/
 
     @Override
     public Observable<AuthResult> signUpWithGoogle(String idToken) {
         return mealRemoteDataSource.signUpWithGoogle(idToken);
     }
+
+    @Override
+    public Single<FirebaseUser> signInWithGoogle(GoogleSignInAccount account) {
+        return mealRemoteDataSource.signInWithGoogle(account);
+    }
+
+    /*@Override
+    public Observable<FirebaseUser> signInWithGoogle(Activity activity) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        return RxJavaInterop.toV2Single(firebaseAuth.signInWithCredential(credential))
+                .map(AuthResult::getUser);
+    }*/
 
     @Override
     public Completable deleteFromRemoteAndLocal(MealsItem mealsItem) {

@@ -18,6 +18,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -45,7 +46,7 @@ public class LoginPresenterImp implements LoginPresenter{
         });
     }
 
-    @Override
+   /* @Override
     public void signInWithGoogle(Activity activity) {
         disposable=mealRepo.signInWithGoogle(activity)
                 .subscribeOn(Schedulers.io())
@@ -53,7 +54,7 @@ public class LoginPresenterImp implements LoginPresenter{
                 subscribe(user->loginView.
                         showSuccessGoogleAuthMessage(user),
                         error->loginView.showFailGoogleAuthMessage(error.getLocalizedMessage()));
-    }
+    }*/
 
 
     @Override
@@ -65,6 +66,15 @@ public class LoginPresenterImp implements LoginPresenter{
         } catch (ApiException e) {
             loginView.showFailGoogleAuthMessage(e.getMessage());
         }
+    }
+
+    @Override
+    public void signInWithGoogle(GoogleSignInAccount account) {
+         mealRepo.signInWithGoogle(account)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(user -> loginView.showSuccessGoogleAuthMessage(user),
+                        throwable -> loginView.showFailGoogleAuthMessage(throwable.getMessage()));
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
